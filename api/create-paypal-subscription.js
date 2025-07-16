@@ -193,7 +193,7 @@ export default async function handler(req, res) {
           return_url: `${baseUrl}/subscription-success`,
           cancel_url: `${baseUrl}/subscription-cancelled`
         },
-        custom_id: `cosmic-${zodiacSign}-${Date.now()}`
+        custom_id: `cosmic-${zodiacSign.split(' ')[0]}-${Date.now()}`
       })
     });
 
