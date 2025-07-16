@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,19 +8,22 @@ import { useToast } from "@/hooks/use-toast";
 import { CelestialBackground } from "@/components/CelestialBackground";
 import { ZodiacSymbol3D } from "@/components/ZodiacSymbol3D";
 import { motion } from "framer-motion";
-import { getCurrentPlan, createSubscriptionPlan, createSubscription } from "@/lib/paypalService";
-import { addSubscriber } from "@/lib/subscriptionManager";
+// PayPal operations now handled server-side via API endpoints
 
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paypalPlanId, setPaypalPlanId] = useState<string | null>(null);
-  const [isInitializing, setIsInitializing] = useState(true);
-  
   const formData = location.state?.formData;
-  const currentPlan = getCurrentPlan();
+  
+  // Test plan details (moved from server-side)
+  const testPlan = {
+    price: '0.01',
+    currency: 'USD',
+    name: 'Cosmic Horoscope Monthly - Test',
+    description: 'Monthly personalized horoscope delivery (Test version)'
+  };
 
   if (!formData) {
     return (
@@ -41,80 +44,40 @@ const Payment = () => {
     );
   }
 
-  // Initialize PayPal plan on component mount
-  useEffect(() => {
-    const initializePayPalPlan = async () => {
-      try {
-        console.log('🎯 Initializing PayPal subscription plan...');
-        const planResult = await createSubscriptionPlan(currentPlan);
-        if (planResult.success) {
-          setPaypalPlanId(planResult.planId);
-          console.log('✅ PayPal plan ready:', planResult.planId);
-        }
-      } catch (error) {
-        console.error('❌ PayPal plan initialization failed:', error);
-        toast({
-          title: "Setup Error",
-          description: "Failed to initialize payment system. Please try again.",
-          variant: "destructive"
-        });
-      } finally {
-        setIsInitializing(false);
-      }
-    };
-
-    initializePayPalPlan();
-  }, []);
-
   const handleSubscription = async () => {
-    if (!paypalPlanId) {
-      toast({
-        title: "Payment system not ready",
-        description: "Please wait for payment system to initialize.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsProcessing(true);
     try {
-      console.log('🚀 Creating PayPal subscription...');
+      console.log('🚀 Creating PayPal subscription via API...');
       
-      // Create subscription with PayPal
-      const subscriptionResult = await createSubscription(paypalPlanId, {
-        name: formData.name,
-        email: formData.email,
-        zodiacSign: formData.zodiacSign
+      // Call server-side API to create subscription
+      const response = await fetch('/api/create-paypal-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          zodiacSign: formData.zodiacSign
+        })
       });
 
-      if (subscriptionResult.success) {
-        // Add subscriber to our system
-        const subscriber = addSubscriber({
-          email: formData.email,
-          name: formData.name,
-          zodiacSign: formData.zodiacSign,
-          paypalSubscriptionId: subscriptionResult.subscriptionId,
-          status: 'active', // Will be updated via webhook when payment completes
-          nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // Approximate
-        });
+      const result = await response.json();
 
-        console.log('✅ Subscriber added to system:', subscriber.id);
-
+      if (result.success && result.data.approvalUrl) {
+        console.log('✅ Subscription created:', result.data.subscriptionId);
+        
         // Redirect to PayPal for approval
-        if (subscriptionResult.approvalUrl) {
-          window.location.href = subscriptionResult.approvalUrl;
-        } else {
-          throw new Error('No approval URL received from PayPal');
-        }
+        window.location.href = result.data.approvalUrl;
       } else {
-        throw new Error('Failed to create subscription');
+        throw new Error(result.error || 'Failed to create subscription');
       }
 
     } catch (error) {
       console.error('Subscription creation error:', error);
       toast({
         title: "❌ Subscription Failed",
-        description: "Failed to create subscription. Please try again.",
+        description: error.message || "Failed to create subscription. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -205,17 +168,17 @@ const Payment = () => {
                     Subscription Details
                   </CardTitle>
                   <CardDescription className="text-white/70">
-                    {currentPlan.description}
+                    {testPlan.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-white mb-2">
-                      ${currentPlan.price}
+                      ${testPlan.price}
                       <span className="text-lg text-white/70 font-normal">/month</span>
                     </div>
                     <Badge variant="secondary" className="bg-yellow-400/20 text-yellow-400 border-yellow-400/20">
-                      {currentPlan.price === '0.01' ? 'Test Mode - 1¢' : 'Production'}
+                      {testPlan.price === '0.01' ? 'Test Mode - 1¢' : 'Production'}
                     </Badge>
                   </div>
 
@@ -241,15 +204,10 @@ const Payment = () => {
                   <div className="pt-4">
                     <Button
                       onClick={handleSubscription}
-                      disabled={isProcessing || isInitializing || !paypalPlanId}
+                      disabled={isProcessing}
                       className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold py-3"
                     >
-                      {isInitializing ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Initializing PayPal...
-                        </>
-                      ) : isProcessing ? (
+                      {isProcessing ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                           Creating Subscription...
@@ -264,7 +222,7 @@ const Payment = () => {
 
                     <p className="text-xs text-white/50 text-center mt-3">
                       You'll be redirected to PayPal to complete your subscription.
-                      {currentPlan.price === '0.01' && ' This is test mode - you will only be charged 1¢.'}
+                      {testPlan.price === '0.01' && ' This is test mode - you will only be charged 1¢.'}
                     </p>
                   </div>
                 </CardContent>
