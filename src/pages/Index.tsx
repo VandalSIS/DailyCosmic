@@ -267,29 +267,18 @@ const Index = () => {
 
           {/* Action Buttons */}
           <motion.div
-            className="mt-8 flex flex-col sm:flex-row gap-4 justify-center"
+            className="mt-8 flex justify-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
             <Button
-              onClick={handleSendFreeCalendar}
+              onClick={handleProceedToPayment}
               className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-6 text-lg font-semibold rounded-xl shadow-xl transform transition-all duration-200 hover:scale-105"
               size="lg"
             >
-              <Gift className="w-5 h-5 mr-2" />
-              Get FREE Calendar Now
-            </Button>
-
-            <Button
-              onClick={handleProceedToPayment}
-              variant="outline"
-              className="border-violet-500/50 text-violet-300 hover:bg-violet-500/10 px-8 py-6 text-lg font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              size="lg"
-              disabled={true}
-            >
               <CreditCard className="w-5 h-5 mr-2" />
-              Premium Version (Coming Soon)
+              Monthly Subscribe (1¢ Test)
             </Button>
           </motion.div>
 
