@@ -12,6 +12,7 @@ import { CelestialBackground } from "@/components/CelestialBackground";
 import { ZodiacSymbol3D } from "@/components/ZodiacSymbol3D";
 import { motion } from "framer-motion";
 import { zodiacPdfMapping } from "@/lib/zodiacPdfMapping";
+import HeroSlider from "@/components/HeroSlider";
 
 const Index = () => {
   const [formData, setFormData] = useState({
@@ -107,8 +108,9 @@ const Index = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
       <CelestialBackground />
-      
-      <div className="container mx-auto px-4 py-8 relative z-20">
+      <HeroSlider />
+      {/* Secțiunea calendar */}
+      <div id="calendar" className="container mx-auto px-4 py-8 relative z-20">
         <div className="max-w-4xl mx-auto">
       {/* Header */}
           <motion.div
