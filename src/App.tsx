@@ -10,9 +10,9 @@ import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import SubscriptionCancelled from "./pages/SubscriptionCancelled";
 import NotFound from "./pages/NotFound";
 // import { Navbar } from "@/components/Navbar";
-import Despre from "./pages/Despre";
-import Abonamente from "./pages/Abonamente";
-import Contact from "./pages/Contact";
+// import Despre from "./pages/Despre";
+// import Abonamente from "./pages/Abonamente";
+// import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -28,9 +28,9 @@ const App = () => (
           <Route path="/payment" element={<Payment />} />
           <Route path="/subscription-success" element={<SubscriptionSuccess />} />
           <Route path="/subscription-cancelled" element={<SubscriptionCancelled />} />
-          <Route path="/despre" element={<Despre />} />
-          <Route path="/abonamente" element={<Abonamente />} />
-          <Route path="/contact" element={<Contact />} />
+          {/* <Route path="/despre" element={<Despre />} /> */}
+          {/* <Route path="/abonamente" element={<Abonamente />} /> */}
+          {/* <Route path="/contact" element={<Contact />} /> */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
