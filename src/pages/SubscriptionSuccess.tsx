@@ -2,16 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Calendar, Mail, Crown, ArrowRight } from "lucide-react";
+import { CheckCircle, Calendar, Mail, Crown, ArrowRight, XCircle, Loader2 } from "lucide-react";
 import { CelestialBackground } from "@/components/CelestialBackground";
 import { motion } from "framer-motion";
 import { getSubscriberByPayPalId, updateSubscriberStatus } from "@/lib/subscriptionManager";
+import { useToast } from "@/hooks/use-toast";
 
 const SubscriptionSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [subscriber, setSubscriber] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     const subscriptionId = searchParams.get('subscription_id');
@@ -30,6 +33,53 @@ const SubscriptionSuccess = () => {
     
     setIsLoading(false);
   }, [searchParams]);
+
+  const handleCancelSubscription = async () => {
+    const subscriptionId = searchParams.get('subscription_id');
+    if (!subscriptionId) {
+      toast({
+        title: "Error",
+        description: "Subscription ID not found",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsCancelling(true);
+    try {
+      const response = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ subscriptionId })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Your subscription has been cancelled",
+        });
+        // Update local subscriber status
+        if (subscriber) {
+          updateSubscriberStatus(subscriber.id, 'cancelled');
+          setSubscriber({ ...subscriber, status: 'cancelled' });
+        }
+      } else {
+        throw new Error(result.error || 'Failed to cancel subscription');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to cancel subscription",
+        variant: "destructive"
+      });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -125,13 +175,35 @@ const SubscriptionSuccess = () => {
                     Back to Homepage
                   </Button>
                   
-                  <Button
-                    variant="outline"
-                    onClick={() => window.open('https://www.paypal.com/myaccount/autopay/', '_blank')}
-                    className="flex-1 border-violet-500/20 text-white hover:bg-violet-500/20"
-                  >
-                    Manage Subscription
-                  </Button>
+                  {subscriber?.status !== 'cancelled' ? (
+                    <Button
+                      variant="outline"
+                      onClick={handleCancelSubscription}
+                      disabled={isCancelling}
+                      className="flex-1 border-red-500/20 text-red-400 hover:bg-red-500/20"
+                    >
+                      {isCancelling ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Cancelling...
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="w-4 h-4 mr-2" />
+                          Cancel Subscription
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      disabled
+                      className="flex-1 border-gray-500/20 text-gray-400"
+                    >
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Subscription Cancelled
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
