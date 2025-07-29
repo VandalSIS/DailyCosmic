@@ -8,11 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Star, Calendar, Mail, CheckCircle, FileText, Gift, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-// import { CelestialBackground } from "@/components/CelestialBackground";
+import { CelestialBackground } from "@/components/CelestialBackground";
 import { ZodiacSymbol3D } from "@/components/ZodiacSymbol3D";
 import { motion } from "framer-motion";
 import { zodiacPdfMapping } from "@/lib/zodiacPdfMapping";
-import HeroSlider from "@/components/HeroSlider";
 
 const Index = () => {
   const [formData, setFormData] = useState({
@@ -107,9 +106,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* <CelestialBackground /> */}
-      <HeroSlider />
-      {/* Secțiunea calendar */}
+      <CelestialBackground />
+      {/* Calendar section */}
       <div id="calendar" className="container mx-auto px-4 py-8 relative z-20">
         <div className="max-w-4xl mx-auto">
       {/* Header */}

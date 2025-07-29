@@ -15,6 +15,7 @@ const SubscriptionSuccess = () => {
   const [subscriber, setSubscriber] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isSendingPdf, setIsSendingPdf] = useState(false);
 
   useEffect(() => {
     const subscriptionId = searchParams.get('subscription_id');
@@ -28,11 +29,51 @@ const SubscriptionSuccess = () => {
         updateSubscriberStatus(foundSubscriber.id, 'active');
         setSubscriber(foundSubscriber);
         console.log('✅ Subscription activated:', foundSubscriber);
+        
+        // Send initial PDF immediately
+        sendInitialPdf(foundSubscriber);
       }
     }
     
     setIsLoading(false);
   }, [searchParams]);
+
+  const sendInitialPdf = async (subscriber: any) => {
+    setIsSendingPdf(true);
+    try {
+      const response = await fetch('/api/send-calendar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: subscriber.email,
+          name: subscriber.name,
+          zodiacSign: subscriber.zodiacSign,
+          orderType: 'paid'
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.emailSent) {
+        toast({
+          title: "✨ Welcome Gift Sent!",
+          description: "Your first cosmic calendar has been sent to your email. Check your spam folder if you don't see it.",
+        });
+      } else {
+        throw new Error(result.emailMessage || 'Failed to send welcome calendar');
+      }
+    } catch (error) {
+      toast({
+        title: "Delivery Delayed",
+        description: "We'll send your first calendar within 24 hours. Thank you for your patience!",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSendingPdf(false);
+    }
+  };
 
   const handleCancelSubscription = async () => {
     const subscriptionId = searchParams.get('subscription_id');
@@ -162,7 +203,16 @@ const SubscriptionSuccess = () => {
 
                 <div className="bg-gradient-to-r from-violet-500/20 to-purple-500/20 p-4 rounded-lg border border-violet-500/30">
                   <p className="text-white text-sm text-center">
-                    🌟 <strong>Thank you for subscribing!</strong> Your first horoscope will arrive on the 15th of next month. You can manage your subscription anytime through PayPal.
+                    {isSendingPdf ? (
+                      <>
+                        <Loader2 className="w-4 h-4 inline-block mr-2 animate-spin" />
+                        <strong>Preparing your welcome gift...</strong> We're sending your first cosmic calendar right now!
+                      </>
+                    ) : (
+                      <>
+                        🌟 <strong>Thank you for subscribing!</strong> Your first horoscope has been sent to your email (check spam folder if needed). Future horoscopes will arrive on the 15th of each month.
+                      </>
+                    )}
                   </p>
                 </div>
 
