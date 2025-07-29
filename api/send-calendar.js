@@ -53,25 +53,12 @@ export default async function handler(req, res) {
     // Get zodiac key (remove emoji)
     const zodiacKey = zodiacSign.split(' ')[0].toLowerCase();
     
-    // Updated PDF URLs with proper encoding
-    const zodiacPdfMapping = {
-      aries: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/aries-calendar-TvKkvqf5gU4sV50Ze7zpMoZhHzmBHa.pdf',
-      taurus: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/taurus-calendar-0z1DCFmeGIoZGd9nDS1irXLdUubLAz.pdf',
-      gemini: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/gemini-calendar-vaDoM71E7xF6S72QsBXmujM38aBJqZ.pdf',
-      cancer: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/cancer-calendar-RQCbA1n6KzAhLU0AzOwuepUoxzlkAD.pdf',
-      leo: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/leo-calendar-6FtRD8yaWPCbQZHC8ZubG9O1GiHbIn.pdf',
-      virgo: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/virgo-calendar-ZhDgkfAQaA7cdxdM0TWVj06GJghRpc.pdf',
-      libra: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/libra-calendar-HezBGjxZjLoLEHKkvu1qj23ZTST2wv.pdf',
-      scorpio: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/scorpio-calendar-VaR5QSMzAwbdvvQ3AlyORkxZx3ynVX.pdf',
-      sagittarius: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/sagittarius-calendar-5VhvnUU2BY2v4FZIl7K5WkMVJdLvRC.pdf',
-      capricorn: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/capricorn-calendar-S0lixufWlVh8LLDIwdu4kDyJrTkc4y.pdf',
-      aquarius: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/aquarius-calendar-tAHcVTaM1xOEuyTAfHGHOPy2hUTe2L.pdf',
-      pisces: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/pisces-calendar-twRDjWJGXqJJaPDdQMRgPKB06qLbqX.pdf'
-    };
+    // Import zodiac mapping
+    const { zodiacPdfMapping } = await import('@/lib/zodiacPdfMapping');
     
-    // Get PDF URL for the zodiac sign
-    const pdfUrl = zodiacPdfMapping[zodiacKey];
-    if (!pdfUrl) {
+    // Get PDF info for the zodiac sign
+    const pdfInfo = zodiacPdfMapping[zodiacKey];
+    if (!pdfInfo || !pdfInfo.blobUrl) {
       return res.status(400).json({
         success: false,
         emailSent: false,
@@ -79,12 +66,12 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log('Fetching PDF for:', zodiacSign, 'from:', pdfUrl);
+    console.log('Fetching PDF for:', zodiacSign, 'from:', pdfInfo.blobUrl);
     
     // Fetch PDF
     let pdfBase64 = null;
     try {
-      const pdfResponse = await fetch(pdfUrl);
+      const pdfResponse = await fetch(pdfInfo.blobUrl);
       
       if (!pdfResponse.ok) {
         throw new Error(`HTTP error! status: ${pdfResponse.status}`);
@@ -146,7 +133,7 @@ export default async function handler(req, res) {
       html: emailContent,
       attachments: [
         {
-          filename: `${zodiacKey}-cosmic-calendar.pdf`,
+          filename: pdfInfo.filename,
           content: pdfBase64,
           contentType: 'application/pdf',
         },
@@ -171,8 +158,8 @@ export default async function handler(req, res) {
       emailSent: true,
       emailMessage: `Calendar sent successfully to ${email}`,
       pdfInfo: {
-        displayName: `${cleanZodiacSign} Daily Calendar`,
-        filename: `${zodiacKey}-calendar.pdf`,
+        displayName: pdfInfo.displayName,
+        filename: pdfInfo.filename,
       },
     });
 
