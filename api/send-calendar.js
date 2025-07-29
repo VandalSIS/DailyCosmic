@@ -25,14 +25,11 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log('API key found, length:', process.env.RESEND_API_KEY.length);
-
     // Import Resend dynamically to catch import errors
     let Resend;
     try {
       const resendModule = await import('resend');
       Resend = resendModule.Resend;
-      console.log('Resend imported successfully');
     } catch (importError) {
       console.error('Failed to import Resend:', importError);
       return res.status(500).json({
@@ -43,7 +40,6 @@ export default async function handler(req, res) {
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-
     const { email, zodiacSign, name } = req.body;
 
     if (!email || !zodiacSign || !name) {
@@ -54,28 +50,26 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log('Sending email to:', email, 'for:', zodiacSign);
-
     // Get zodiac key (remove emoji)
     const zodiacKey = zodiacSign.split(' ')[0].toLowerCase();
     
-    // Import zodiac mapping to get PDF URL
+    // Updated PDF URLs with proper encoding
     const zodiacPdfMapping = {
       aries: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/aries-calendar-TvKkvqf5gU4sV50Ze7zpMoZhHzmBHa.pdf',
-      taurus: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Taurus%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-0z1DCFmeGIoZGd9nDS1irXLdUubLAz.pdf',
-      gemini: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Gemini%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-vaDoM71E7xF6S72QsBXmujM38aBJqZ.pdf',
-      cancer: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Cancer%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-RQCbA1n6KzAhLU0AzOwuepUoxzlkAD.pdf',
-      leo: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Leo%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-6FtRD8yaWPCbQZHC8ZubG9O1GiHbIn.pdf',
-      virgo: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Virgo%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-ZhDgkfAQaA7cdxdM0TWVj06GJghRpc.pdf',
-      libra: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Libra%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-HezBGjxZjLoLEHKkvu1qj23ZTST2wv.pdf',
-      scorpio: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Scorpio%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-VaR5QSMzAwbdvvQ3AlyORkxZx3ynVX.pdf',
-      sagittarius: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Sagittarius%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-5VhvnUU2BY2v4FZIl7K5WkMVJdLvRC.pdf',
-      capricorn: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Capricorn%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-S0lixufWlVh8LLDIwdu4kDyJrTkc4y.pdf',
-      aquarius: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Aquarius%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-tAHcVTaM1xOEuyTAfHGHOPy2hUTe2L.pdf',
-      pisces: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Pisces%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-twRDjWJGXqJJaPDdQMRgPKB06qLbqX.pdf'
+      taurus: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/taurus-calendar-0z1DCFmeGIoZGd9nDS1irXLdUubLAz.pdf',
+      gemini: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/gemini-calendar-vaDoM71E7xF6S72QsBXmujM38aBJqZ.pdf',
+      cancer: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/cancer-calendar-RQCbA1n6KzAhLU0AzOwuepUoxzlkAD.pdf',
+      leo: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/leo-calendar-6FtRD8yaWPCbQZHC8ZubG9O1GiHbIn.pdf',
+      virgo: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/virgo-calendar-ZhDgkfAQaA7cdxdM0TWVj06GJghRpc.pdf',
+      libra: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/libra-calendar-HezBGjxZjLoLEHKkvu1qj23ZTST2wv.pdf',
+      scorpio: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/scorpio-calendar-VaR5QSMzAwbdvvQ3AlyORkxZx3ynVX.pdf',
+      sagittarius: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/sagittarius-calendar-5VhvnUU2BY2v4FZIl7K5WkMVJdLvRC.pdf',
+      capricorn: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/capricorn-calendar-S0lixufWlVh8LLDIwdu4kDyJrTkc4y.pdf',
+      aquarius: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/aquarius-calendar-tAHcVTaM1xOEuyTAfHGHOPy2hUTe2L.pdf',
+      pisces: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/pisces-calendar-twRDjWJGXqJJaPDdQMRgPKB06qLbqX.pdf'
     };
     
-    // Check if PDF is available for this zodiac sign
+    // Get PDF URL for the zodiac sign
     const pdfUrl = zodiacPdfMapping[zodiacKey];
     if (!pdfUrl) {
       return res.status(400).json({
@@ -85,128 +79,81 @@ export default async function handler(req, res) {
       });
     }
 
-    // TEMPORARY: Use a working public PDF for testing
-    const testPdfUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
-    const ariesPdfUrl = 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/aries-calendar-TvKkvqf5gU4sV50Ze7zpMoZhHzmBHa.pdf';
-
-    console.log('Fetching PDF from:', ariesPdfUrl, '(using CORRECT URL now)');
     console.log('Fetching PDF for:', zodiacSign, 'from:', pdfUrl);
-
-    // Fetch PDF - try the correct URL
-    let pdfBase64 = null;
-    let pdfError = null;
     
+    // Fetch PDF
+    let pdfBase64 = null;
     try {
-      console.log('Starting PDF fetch with CORRECT URL...');
-      console.log('Starting PDF fetch for', zodiacKey, '...');
-      
-      // Use the correct PDF URL for the zodiac sign
       const pdfResponse = await fetch(pdfUrl);
       
-      console.log('PDF Response status:', pdfResponse.status);
-      console.log('PDF Response statusText:', pdfResponse.statusText);
-      
-      if (pdfResponse.status === 200) {
-        console.log('PDF fetched successfully, converting to base64...');
-        const pdfBuffer = await pdfResponse.arrayBuffer();
-        pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
-        console.log('PDF converted to base64, size:', pdfBase64.length);
-      } else {
-        pdfError = `Failed to fetch PDF: ${pdfResponse.status} ${pdfResponse.statusText}`;
-        console.error('PDF fetch failed:', pdfError);
+      if (!pdfResponse.ok) {
+        throw new Error(`HTTP error! status: ${pdfResponse.status}`);
       }
       
+      const pdfBuffer = await pdfResponse.arrayBuffer();
+      pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
+      console.log('PDF fetched and converted to base64, size:', pdfBase64.length);
+      
     } catch (error) {
-      pdfError = `PDF fetch error: ${error.message}`;
-      console.error('PDF fetch exception:', pdfError);
-      console.error('Full error:', error);
-      console.error('Error stack:', error.stack);
+      console.error('PDF fetch error:', error);
+      return res.status(500).json({
+        success: false,
+        emailSent: false,
+        emailMessage: `Failed to fetch PDF: ${error.message}`
+      });
     }
-
-    console.log('PDF fetch completed. pdfBase64 length:', pdfBase64 ? pdfBase64.length : 'null');
-    console.log('PDF error:', pdfError);
 
     // Clean zodiac sign (remove emoji)
     const cleanZodiacSign = zodiacSign.split(' ')[0];
 
-    console.log('Sending email via Resend...');
-
     // Prepare email content
-    const emailContent = pdfBase64 ? `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #fff; font-size: 28px; margin-bottom: 10px;">🌟 Cosmic Daily Planner</h1>
-            <p style="color: #e0e0e0; font-size: 16px;">Your personalized zodiac calendar has arrived!</p>
-          </div>
-          
-          <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <h2 style="color: #fff; margin-top: 0;">Hello ${name}! ✨</h2>
-            <p style="color: #e0e0e0; line-height: 1.6;">
-              Your FREE <strong>${cleanZodiacSign} Daily Calendar</strong> is attached to this email! 
-              This personalized calendar contains 365 days of cosmic guidance specifically tailored for your zodiac sign.
-            </p>
-          </div>
-
-          <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #e0e0e0; font-size: 14px;">
-              Thank you for choosing Cosmic Daily Planner! 🌟<br>
-              May the stars guide your path to success and happiness.
-            </p>
-          </div>
+    const emailContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #fff; font-size: 28px; margin-bottom: 10px;">🌟 Cosmic Daily Planner</h1>
+          <p style="color: #e0e0e0; font-size: 16px;">Your personalized zodiac calendar has arrived!</p>
         </div>
-      ` : `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #fff; font-size: 28px; margin-bottom: 10px;">🌟 Cosmic Daily Planner</h1>
-            <p style="color: #e0e0e0; font-size: 16px;">Your calendar request has been received!</p>
-          </div>
-          
-          <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <h2 style="color: #fff; margin-top: 0;">Hello ${name}! ✨</h2>
-            <p style="color: #e0e0e0; line-height: 1.6;">
-              Thank you for your interest in our FREE <strong>${cleanZodiacSign} Daily Calendar</strong>!
-            </p>
-            <p style="color: #e0e0e0; line-height: 1.6;">
-              We're currently updating our PDF storage system. Your personalized calendar will be sent to you within 24 hours.
-            </p>
-            <p style="color: #e0e0e0; line-height: 1.6;">
-              <strong>What you'll receive:</strong><br>
-              • 365 days of personalized daily guidance<br>
-              • Cosmic insights and predictions<br>
-              • Perfect timing for important decisions<br>
-              • High-resolution PDF ready for printing
-            </p>
-          </div>
-
-          <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #e0e0e0; font-size: 14px;">
-              Thank you for choosing Cosmic Daily Planner! 🌟<br>
-              May the stars guide your path to success and happiness.
-            </p>
-          </div>
+        
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h2 style="color: #fff; margin-top: 0;">Hello ${name}! ✨</h2>
+          <p style="color: #e0e0e0; line-height: 1.6;">
+            Your <strong>${cleanZodiacSign} Daily Calendar</strong> is attached to this email! 
+            This personalized calendar contains 365 days of cosmic guidance specifically tailored for your zodiac sign.
+          </p>
+          <p style="color: #e0e0e0; line-height: 1.6;">
+            <strong>What's included:</strong><br>
+            • 365 days of personalized daily guidance<br>
+            • Cosmic insights and predictions<br>
+            • Perfect timing for important decisions<br>
+            • High-resolution PDF ready for printing
+          </p>
         </div>
-      `;
+
+        <div style="text-align: center; margin-top: 30px;">
+          <p style="color: #e0e0e0; font-size: 14px;">
+            Thank you for choosing Cosmic Daily Planner! 🌟<br>
+            May the stars guide your path to success and happiness.
+          </p>
+        </div>
+      </div>
+    `;
 
     // Prepare email data
     const emailData = {
       from: 'Cosmic Daily Planner <noreply@cadalunastro.com>',
       to: [email],
-      subject: `🌟 Your FREE ${cleanZodiacSign} Calendar ${pdfBase64 ? 'is Ready!' : 'Request Received!'}`,
-      html: emailContent
-    };
-
-    // Add attachment if PDF is available
-    if (pdfBase64) {
-      emailData.attachments = [
+      subject: `🌟 Your ${cleanZodiacSign} Cosmic Calendar is Ready!`,
+      html: emailContent,
+      attachments: [
         {
-          filename: `${zodiacKey}-calendar.pdf`,
+          filename: `${zodiacKey}-cosmic-calendar.pdf`,
           content: pdfBase64,
           contentType: 'application/pdf',
         },
-      ];
-    }
+      ]
+    };
 
-    // Send email with Resend using your verified domain
+    // Send email
     const { data, error } = await resend.emails.send(emailData);
 
     if (error) {

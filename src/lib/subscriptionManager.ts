@@ -1,5 +1,5 @@
 // Subscription Manager - handles subscribers and integrates with PayPal
-import { Subscriber } from './paypalService';
+import { zodiacPdfMapping, getPdfUrl } from './zodiacPdfMapping';
 
 export interface MonthlyHoroscope {
   id: string;
@@ -12,20 +12,19 @@ export interface MonthlyHoroscope {
   sentAt?: string; // When it was actually sent
 }
 
-export interface SubscriberData {
+interface SubscriberData {
   id: string;
-  email: string;
   name: string;
+  email: string;
   zodiacSign: string;
-  paypalSubscriptionId: string;
-  status: 'active' | 'cancelled' | 'expired' | 'payment_failed';
-  nextBillingDate: string;
+  status: 'pending' | 'active' | 'cancelled';
+  paypalSubscriptionId?: string;
+  nextDeliveryDate?: string;
   createdAt: string;
-  lastHoroscopeSent?: string; // Last month sent ("2024-01")
-  totalHoroscopesReceived: number;
+  updatedAt: string;
 }
 
-// In-memory storage for development (în production va fi baza de date)
+// In-memory storage for development
 let subscribers: SubscriberData[] = [];
 let monthlyHoroscopes: MonthlyHoroscope[] = [];
 
@@ -42,18 +41,34 @@ export function getNextMonth(month?: string): string {
   return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}`;
 }
 
+// Get next delivery date (15th of next month)
+function getNextDeliveryDate(): string {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  // If we're past the 15th, schedule for next month
+  // If we're before the 15th, schedule for this month
+  let deliveryDate = new Date(currentYear, currentMonth, 15);
+  if (now.getDate() >= 15) {
+    deliveryDate = new Date(currentYear, currentMonth + 1, 15);
+  }
+  
+  return deliveryDate.toISOString();
+}
+
 // Add new subscriber
-export function addSubscriber(subscriberData: Omit<SubscriberData, 'id' | 'createdAt' | 'totalHoroscopesReceived'>): SubscriberData {
+export function addSubscriber(data: Omit<SubscriberData, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'nextDeliveryDate'>): SubscriberData {
   const subscriber: SubscriberData = {
-    ...subscriberData,
-    id: `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: `sub_${Date.now()}`,
+    ...data,
+    status: 'pending',
+    nextDeliveryDate: getNextDeliveryDate(),
     createdAt: new Date().toISOString(),
-    totalHoroscopesReceived: 0
+    updatedAt: new Date().toISOString()
   };
   
   subscribers.push(subscriber);
-  console.log(`✅ New subscriber added: ${subscriber.email} (${subscriber.zodiacSign})`);
-  
   return subscriber;
 }
 
@@ -81,34 +96,31 @@ export function getSubscribersByZodiac(zodiacSign: string): SubscriberData[] {
 }
 
 // Update subscriber status
-export function updateSubscriberStatus(
-  subscriberId: string, 
-  status: SubscriberData['status'], 
-  nextBillingDate?: string
-): boolean {
-  const subscriber = subscribers.find(sub => sub.id === subscriberId);
-  if (!subscriber) return false;
-  
-  subscriber.status = status;
-  if (nextBillingDate) {
-    subscriber.nextBillingDate = nextBillingDate;
+export function updateSubscriberStatus(subscriberId: string, status: SubscriberData['status']): boolean {
+  const subscriber = subscribers.find(s => s.id === subscriberId);
+  if (subscriber) {
+    subscriber.status = status;
+    subscriber.updatedAt = new Date().toISOString();
+    
+    // If activated, set next delivery date
+    if (status === 'active') {
+      subscriber.nextDeliveryDate = getNextDeliveryDate();
+    }
+    
+    return true;
   }
-  
-  console.log(`📝 Subscriber ${subscriber.email} status updated to: ${status}`);
-  return true;
+  return false;
 }
 
-// Update subscriber PayPal subscription ID
-export function updateSubscriberPayPalId(
-  subscriberId: string, 
-  paypalSubscriptionId: string
-): boolean {
-  const subscriber = subscribers.find(sub => sub.id === subscriberId);
-  if (!subscriber) return false;
-  
-  subscriber.paypalSubscriptionId = paypalSubscriptionId;
-  console.log(`🔗 Subscriber ${subscriber.email} linked to PayPal subscription: ${paypalSubscriptionId}`);
-  return true;
+// Update subscriber PayPal ID
+export function updateSubscriberPayPalId(subscriberId: string, paypalSubscriptionId: string): boolean {
+  const subscriber = subscribers.find(s => s.id === subscriberId);
+  if (subscriber) {
+    subscriber.paypalSubscriptionId = paypalSubscriptionId;
+    subscriber.updatedAt = new Date().toISOString();
+    return true;
+  }
+  return false;
 }
 
 // Mark horoscope as sent to subscriber
@@ -226,6 +238,60 @@ export function createTemplatesForNextMonth(): MonthlyHoroscope[] {
   
   console.log(`📅 Created ${createdTemplates.length} horoscope templates for ${nextMonth}`);
   return createdTemplates;
+}
+
+// Get all active subscribers due for delivery
+export function getSubscribersDueForDelivery(): SubscriberData[] {
+  const now = new Date();
+  return subscribers.filter(subscriber => {
+    if (subscriber.status !== 'active' || !subscriber.nextDeliveryDate) {
+      return false;
+    }
+    
+    const deliveryDate = new Date(subscriber.nextDeliveryDate);
+    return deliveryDate <= now;
+  });
+}
+
+// Update next delivery date for a subscriber
+export function updateNextDeliveryDate(subscriberId: string): boolean {
+  const subscriber = subscribers.find(s => s.id === subscriberId);
+  if (subscriber) {
+    subscriber.nextDeliveryDate = getNextDeliveryDate();
+    subscriber.updatedAt = new Date().toISOString();
+    return true;
+  }
+  return false;
+}
+
+// Process monthly deliveries
+export async function processMonthlyDeliveries() {
+  const dueSubscribers = getSubscribersDueForDelivery();
+  
+  for (const subscriber of dueSubscribers) {
+    try {
+      // Send calendar email
+      const response = await fetch('/api/send-calendar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: subscriber.email,
+          name: subscriber.name,
+          zodiacSign: subscriber.zodiacSign,
+          orderType: 'subscription'
+        })
+      });
+
+      if (response.ok) {
+        // Update next delivery date
+        updateNextDeliveryDate(subscriber.id);
+      }
+    } catch (error) {
+      console.error(`Failed to process delivery for subscriber ${subscriber.id}:`, error);
+    }
+  }
 }
 
 // Get dashboard statistics
