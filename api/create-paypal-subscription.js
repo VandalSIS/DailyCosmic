@@ -1,3 +1,5 @@
+import { updateSubscriberPayPalId } from './lib/subscriptionManager.js';
+
 export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -212,9 +214,6 @@ export default async function handler(req, res) {
       throw new Error('No approval URL received from PayPal');
     }
 
-    // Import subscription manager
-    const { updateSubscriberPayPalId } = await import('@/lib/subscriptionManager');
-    
     // Update subscriber with PayPal subscription ID
     updateSubscriberPayPalId(subscriberId, subscriptionData.id);
 
