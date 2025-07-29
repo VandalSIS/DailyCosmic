@@ -9,62 +9,62 @@ export const zodiacPdfMapping: Record<string, ZodiacPdfMapping> = {
   aries: {
     filename: 'aries-calendar.pdf',
     displayName: 'Aries Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/aries-calendar-TvKkvqf5gU4sV50Ze7zpMoZhHzmBHa.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/aries-calendar.pdf'
   },
   taurus: {
     filename: 'taurus-calendar.pdf',
     displayName: 'Taurus Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Taurus%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-0z1DCFmeGIoZGd9nDS1irXLdUubLAz.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/taurus-calendar.pdf'
   },
   gemini: {
     filename: 'gemini-calendar.pdf',
     displayName: 'Gemini Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Gemini%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-vaDoM71E7xF6S72QsBXmujM38aBJqZ.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/gemini-calendar.pdf'
   },
   cancer: {
     filename: 'cancer-calendar.pdf',
     displayName: 'Cancer Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Cancer%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-RQCbA1n6KzAhLU0AzOwuepUoxzlkAD.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/cancer-calendar.pdf'
   },
   leo: {
     filename: 'leo-calendar.pdf',
     displayName: 'Leo Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Leo%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-6FtRD8yaWPCbQZHC8ZubG9O1GiHbIn.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/leo-calendar.pdf'
   },
   virgo: {
     filename: 'virgo-calendar.pdf',
     displayName: 'Virgo Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Virgo%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-ZhDgkfAQaA7cdxdM0TWVj06GJghRpc.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/virgo-calendar.pdf'
   },
   libra: {
     filename: 'libra-calendar.pdf',
     displayName: 'Libra Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Libra%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-HezBGjxZjLoLEHKkvu1qj23ZTST2wv.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/libra-calendar.pdf'
   },
   scorpio: {
     filename: 'scorpio-calendar.pdf',
     displayName: 'Scorpio Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Scorpio%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-VaR5QSMzAwbdvvQ3AlyORkxZx3ynVX.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/scorpio-calendar.pdf'
   },
   sagittarius: {
     filename: 'sagittarius-calendar.pdf',
     displayName: 'Sagittarius Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Sagittarius%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-5VhvnUU2BY2v4FZIl7K5WkMVJdLvRC.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/sagittarius-calendar.pdf'
   },
   capricorn: {
     filename: 'capricorn-calendar.pdf',
     displayName: 'Capricorn Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Capricorn%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-S0lixufWlVh8LLDIwdu4kDyJrTkc4y.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/capricorn-calendar.pdf'
   },
   aquarius: {
     filename: 'aquarius-calendar.pdf',
     displayName: 'Aquarius Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Aquarius%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-tAHcVTaM1xOEuyTAfHGHOPy2hUTe2L.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/aquarius-calendar.pdf'
   },
   pisces: {
     filename: 'pisces-calendar.pdf',
     displayName: 'Pisces Daily Planner',
-    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Pisces%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-twRDjWJGXqJJaPDdQMRgPKB06qLbqX.pdf'
+    blobUrl: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/pisces-calendar.pdf'
   }
 };
 
