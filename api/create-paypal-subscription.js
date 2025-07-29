@@ -13,16 +13,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, email, zodiacSign } = req.body;
+    const { name, email, zodiacSign, subscriberId } = req.body;
 
-    if (!name || !email || !zodiacSign) {
+    if (!name || !email || !zodiacSign || !subscriberId) {
       return res.status(400).json({ 
         success: false,
-        error: 'Missing required fields: name, email, zodiacSign' 
+        error: 'Missing required fields: name, email, zodiacSign, subscriberId' 
       });
     }
 
-    console.log('🎯 Creating PayPal subscription for:', { name, email, zodiacSign });
+    console.log('🎯 Creating PayPal subscription for:', { name, email, zodiacSign, subscriberId });
 
     // PayPal configuration
     const clientId = process.env.PAYPAL_CLIENT_ID;
@@ -190,10 +190,10 @@ export default async function handler(req, res) {
             payer_selected: 'PAYPAL',
             payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED'
           },
-          return_url: `${baseUrl}/subscription-success`,
+          return_url: `${baseUrl}/subscription-success?subscriberId=${subscriberId}`,
           cancel_url: `${baseUrl}/subscription-cancelled`
         },
-        custom_id: `cosmic-${zodiacSign.split(' ')[0]}-${Date.now()}`
+        custom_id: `cosmic-${zodiacSign.split(' ')[0]}-${subscriberId}`
       })
     });
 
@@ -211,6 +211,12 @@ export default async function handler(req, res) {
     if (!approvalUrl) {
       throw new Error('No approval URL received from PayPal');
     }
+
+    // Import subscription manager
+    const { updateSubscriberPayPalId } = await import('@/lib/subscriptionManager');
+    
+    // Update subscriber with PayPal subscription ID
+    updateSubscriberPayPalId(subscriberId, subscriptionData.id);
 
     return res.status(200).json({
       success: true,

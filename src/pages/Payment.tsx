@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CelestialBackground } from "@/components/CelestialBackground";
 import { ZodiacSymbol3D } from "@/components/ZodiacSymbol3D";
 import { motion } from "framer-motion";
-// PayPal operations now handled server-side via API endpoints
+import { addSubscriber } from "@/lib/subscriptionManager";
 
 const Payment = () => {
   const location = useLocation();
@@ -47,6 +47,13 @@ const Payment = () => {
   const handleSubscription = async () => {
     setIsProcessing(true);
     try {
+      // First, create a subscriber
+      const subscriber = addSubscriber({
+        name: formData.name,
+        email: formData.email,
+        zodiacSign: formData.zodiacSign
+      });
+      
       console.log('🚀 Creating PayPal subscription via API...');
       
       // Call server-side API to create subscription
@@ -58,7 +65,8 @@ const Payment = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          zodiacSign: formData.zodiacSign
+          zodiacSign: formData.zodiacSign,
+          subscriberId: subscriber.id // Pass the subscriber ID
         })
       });
 
