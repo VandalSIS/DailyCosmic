@@ -7,7 +7,7 @@
       "config": { "zeroConfig": true }
     },
     {
-      "src": "api/**/*.js",
+      "src": "api/!(test*)/*.js",
       "use": "@vercel/node"
     }
   ],
@@ -20,5 +20,9 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
+  ],
+  "ignorePatterns": [
+    "api/test-*.js",
+    "api/test/*.js"
   ]
 } 
