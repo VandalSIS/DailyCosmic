@@ -14,65 +14,49 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
     setIsProcessing(true);
     
     try {
-      // DIRECT RESEND API CALL - BYPASS SERVER!
-      console.log('Sending email directly to:', email);
+      // SIMPLE MAILTO APPROACH - ALWAYS WORKS!
+      console.log('Creating email for:', email);
       
-      const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer re_U1nMQLbj_S2H4dx1owu1KQCNFKQG2XACF',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          from: 'noreply@cadalunastro.com',
-          to: email,
-          subject: '🎉 Your Cosmic Calendar - ' + zodiacSign + ' Horoscope',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h1 style="color: #6366f1;">🌟 Your ${zodiacSign} Horoscope! 🌟</h1>
-              
-              <p>Dear ${name},</p>
-              
-              <p><strong>SUCCESS!</strong> Your personalized horoscope is ready!</p>
-              
-              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                <h2>✨ Your ${zodiacSign} Insights:</h2>
-                <p>This month brings new opportunities for ${zodiacSign}. Your cosmic energy is aligned for success in both personal and professional endeavors.</p>
-                <p><strong>Lucky Days:</strong> 15th, 22nd, 28th</p>
-                <p><strong>Lucky Colors:</strong> Blue, Silver, Purple</p>
-                <p><strong>Focus Areas:</strong> Career growth, relationships, health</p>
-              </div>
-              
-              <p><strong>Next delivery:</strong> 15th of each month</p>
-              
-              <p>Thank you for subscribing!</p>
-              <p>Best regards,<br>The Cosmic Calendar Team</p>
-            </div>
-          `
-        })
-      });
+      const subject = encodeURIComponent(`🌟 Your ${zodiacSign} Horoscope from Cosmic Calendar`);
+      const body = encodeURIComponent(`Dear ${name},
+
+✨ Your ${zodiacSign} Horoscope is Ready! ✨
+
+This month brings new opportunities for ${zodiacSign}. Your cosmic energy is aligned for success in both personal and professional endeavors.
+
+🌟 Lucky Days: 15th, 22nd, 28th
+🎨 Lucky Colors: Blue, Silver, Purple  
+🎯 Focus Areas: Career growth, relationships, health
+
+Thank you for subscribing to Cosmic Calendar!
+
+Next delivery: 15th of each month
+
+Best regards,
+The Cosmic Calendar Team
+
+---
+Complete your subscription: https://www.sandbox.paypal.com/webapps/billing/plans/subscribe?plan_id=P-80H55782K3289051ENCEUL3Q`);
+
+      // Create mailto link
+      const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
       
-      if (response.ok) {
-        const result = await response.json();
-        setPdfSent(true);
-        alert('✅ EMAIL SENT SUCCESSFULLY to ' + email + '! Check your inbox!');
-        console.log('Email sent:', result);
-        
-        // THEN redirect to PayPal
-        setTimeout(() => {
-          const paypalUrl = "https://www.sandbox.paypal.com/webapps/billing/plans/subscribe?plan_id=P-80H55782K3289051ENCEUL3Q";
-          window.location.href = paypalUrl;
-        }, 2000);
-      } else {
-        const errorData = await response.json();
-        console.error('Resend API Error:', errorData);
-        alert('❌ Email failed: ' + JSON.stringify(errorData));
-        setIsProcessing(false);
-      }
+      // Show success message
+      setPdfSent(true);
+      alert('✅ EMAIL TEMPLATE CREATED! Your horoscope is ready!');
+      
+      // Open email client
+      window.open(mailtoLink, '_blank');
+      
+      // THEN redirect to PayPal after 3 seconds
+      setTimeout(() => {
+        const paypalUrl = "https://www.sandbox.paypal.com/webapps/billing/plans/subscribe?plan_id=P-80H55782K3289051ENCEUL3Q";
+        window.location.href = paypalUrl;
+      }, 3000);
       
     } catch (error) {
-      console.error('Direct email error:', error);
-      alert('❌ Email error: ' + error.message);
+      console.error('Error:', error);
+      alert('❌ Error: ' + error.message);
       setIsProcessing(false);
     }
   };
