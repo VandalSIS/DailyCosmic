@@ -12,7 +12,61 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
     const paypalUrl = "https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-40N61099UW225793TNCE7N4I";
     
     // Open PayPal in new window
-    window.open(paypalUrl, '_blank');
+    const newWindow = window.open(paypalUrl, '_blank');
+    
+    // After payment, call our API to send PDF
+    const checkPayment = setInterval(() => {
+      if (newWindow && newWindow.closed) {
+        clearInterval(checkPayment);
+        
+        // PayPal window closed, assume payment completed
+        // Call our API to send welcome PDF
+        fetch('/api/create-paypal-subscription', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            zodiacSign,
+            subscriptionId: `paypal_${Date.now()}`
+          })
+        }).then(() => {
+          // Redirect to success page
+          window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
+        }).catch(() => {
+          // Still redirect even if API fails
+          window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
+        });
+      }
+    }, 1000);
+    
+    // Fallback: if window doesn't close within 5 minutes, assume payment completed
+    setTimeout(() => {
+      clearInterval(checkPayment);
+      if (newWindow && !newWindow.closed) {
+        newWindow.close();
+      }
+      
+      // Call API to send PDF
+      fetch('/api/create-paypal-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          zodiacSign,
+          subscriptionId: `paypal_${Date.now()}`
+        })
+      }).then(() => {
+        window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
+      }).catch(() => {
+        window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
+      });
+    }, 300000); // 5 minutes
   };
 
   return (
