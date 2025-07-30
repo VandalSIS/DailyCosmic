@@ -9,6 +9,7 @@ interface PayPalSubscriptionProps {
 const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zodiacSign }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSendingPdf, setIsSendingPdf] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   const handlePayPalClick = () => {
     // Direct PayPal subscription link from the copy link option
@@ -23,10 +24,33 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
 
   const handleConfirmPayment = async () => {
     setIsSendingPdf(true);
+    setDebugInfo('Starting PDF send...');
     
     try {
-      // Call API to send PDF
-      await fetch('/api/create-paypal-subscription', {
+      // First test the API
+      setDebugInfo('Testing API...');
+      const testResponse = await fetch('/api/test-pdf-send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          zodiacSign
+        })
+      });
+
+      const testResult = await testResponse.json();
+      setDebugInfo(`Test result: ${JSON.stringify(testResult)}`);
+
+      if (!testResult.success) {
+        throw new Error('Test API failed');
+      }
+
+      // Now try the real API
+      setDebugInfo('Calling real API...');
+      const response = await fetch('/api/create-paypal-subscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,12 +62,20 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
           subscriptionId: `paypal_${Date.now()}`
         })
       });
+
+      const result = await response.json();
+      setDebugInfo(`Real API result: ${JSON.stringify(result)}`);
       
-      // Redirect to success page
-      window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
+      if (response.ok) {
+        // Redirect to success page
+        window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
+      } else {
+        throw new Error(`API failed: ${result.error}`);
+      }
     } catch (error) {
       console.error('Error sending PDF:', error);
-      alert('Error sending PDF. Please try again.');
+      setDebugInfo(`Error: ${error.message}`);
+      alert(`Error sending PDF: ${error.message}`);
       setIsSendingPdf(false);
     }
   };
@@ -72,6 +104,12 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
           >
             {isSendingPdf ? 'Sending PDF...' : '✅ Confirm Payment & Send PDF'}
           </button>
+          
+          {debugInfo && (
+            <div className="mt-3 p-2 bg-gray-100 rounded text-xs">
+              <strong>Debug:</strong> {debugInfo}
+            </div>
+          )}
         </div>
       )}
       
