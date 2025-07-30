@@ -54,17 +54,41 @@ async function sendPdfToSubscriber(paymentInfo, subscriptionId) {
   try {
     console.log('🚀 Sending PDF for confirmed payment...');
     
-    // Get email from PayPal payment info
-    const email = paymentInfo.payer?.payer_info?.email || paymentInfo.payer?.email_address;
+    // Try to get stored subscriber data first
+    const paypalEmail = paymentInfo.payer?.payer_info?.email || paymentInfo.payer?.email_address;
     
-    if (!email) {
-      console.error('No email found in payment info');
-      return;
+    // Import subscriber functions
+    let subscriberEmail = null;
+    let subscriberData = null;
+    
+    try {
+      const { getSubscriberByEmail, getAllSubscribers } = await import('./store-subscriber.js');
+      
+      // Get all stored subscribers and find the most recent one
+      // This is a temporary solution - in production you'd want better mapping
+      const allSubscribers = getAllSubscribers();
+      console.log('All stored subscribers:', allSubscribers);
+      
+      if (allSubscribers && allSubscribers.size > 0) {
+        // Get the most recent subscriber (last one added)
+        const subscriberEntries = Array.from(allSubscribers.entries());
+        const [email, data] = subscriberEntries[subscriberEntries.length - 1];
+        
+        subscriberEmail = email;
+        subscriberData = data;
+        console.log('Using stored subscriber:', subscriberData);
+      }
+      
+    } catch (error) {
+      console.error('Error accessing subscriber data:', error);
     }
     
-    // Use default zodiac for now (you can enhance this later)
-    const zodiacSign = 'Gemini';
-    const name = paymentInfo.payer?.payer_info?.first_name || 'Valued Customer';
+    // Use subscriber data if available, otherwise fall back to PayPal data
+    const email = subscriberEmail || paypalEmail;
+    const zodiacSign = subscriberData?.zodiacSign || 'Gemini';
+    const name = subscriberData?.name || paymentInfo.payer?.payer_info?.first_name || 'Valued Customer';
+    
+    console.log('Sending PDF to:', { email, name, zodiacSign });
     
     const { Resend } = await import('resend');
     const { getSignedUrl } = await import('@vercel/blob');
