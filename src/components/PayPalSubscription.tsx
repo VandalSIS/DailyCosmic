@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Loader2 } from "lucide-react";
 
 interface PayPalSubscriptionProps {
@@ -10,6 +10,55 @@ interface PayPalSubscriptionProps {
 const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zodiacSign }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [paypalLoaded, setPaypalLoaded] = useState(false);
+
+  const renderPayPalButton = useCallback((container: HTMLDivElement) => {
+    if (!container || !(window as any).paypal) {
+      return;
+    }
+
+    console.log("Rendering PayPal button...");
+    
+    // @ts-ignore
+    (window as any).paypal.Buttons({
+      style: {
+        shape: 'rect',
+        color: 'gold',
+        layout: 'vertical',
+        label: 'subscribe'
+      },
+      createSubscription: (data: any, actions: any) => {
+        console.log("Creating subscription...");
+        return actions.subscription.create({
+          plan_id: "P-40N61099UW225793TNCE7N4I"
+        });
+      },
+      onApprove: (data: any) => {
+        console.log("Subscription approved:", data);
+        alert("Subscription created! ID: " + data.subscriptionID);
+        window.location.href = `/subscription-success?subscription_id=${data.subscriptionID}`;
+      },
+      onError: (err: any) => {
+        console.error("PayPal Error:", err);
+        setError("PayPal error: " + err.message);
+      }
+    }).render(container)
+      .then(() => {
+        console.log("PayPal button rendered successfully");
+        setIsLoading(false);
+      })
+      .catch((err: any) => {
+        console.error("PayPal render error:", err);
+        setError("Failed to render PayPal button: " + err.message);
+        setIsLoading(false);
+      });
+  }, []);
+
+  const containerRef = useCallback((container: HTMLDivElement | null) => {
+    if (container && paypalLoaded) {
+      renderPayPalButton(container);
+    }
+  }, [paypalLoaded, renderPayPalButton]);
 
   useEffect(() => {
     const loadPayPalScript = async () => {
@@ -17,83 +66,39 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
         setIsLoading(true);
         setError(null);
         
+        // Check if PayPal script is already loaded
+        if ((window as any).paypal) {
+          console.log("PayPal already loaded");
+          setPaypalLoaded(true);
+          return;
+        }
+
         const script = document.createElement("script");
-        script.src = "https://www.paypal.com/sdk/js?client-id=ASmSlhvv_5Rie80Qt0OBS&vault=true&intent=subscription";
+        script.src = "https://www.paypal.com/sdk/js?client-id=ARomUkFNIwXiH39_TQWlup7WueGqDRdJJ7htrMnqJ52fYYm_GG1MLP1YnbBH1ubgNnXNWV8tPJ2OwByk&vault=true&intent=subscription";
         script.async = true;
         
         script.onload = () => {
-          setIsLoading(false);
-          // @ts-ignore
-          window.paypal.Buttons({
-            createSubscription: async (data: any, actions: any) => {
-              try {
-                // Create PayPal subscription
-                return actions.subscription.create({
-                  plan_id: "P-40N61099UW225793TNCE7N4I"
-                });
-              } catch (err) {
-                console.error("PayPal subscription creation error:", err);
-                setError("Failed to create subscription. Please try again.");
-                throw err;
-              }
-            },
-            onApprove: async (data: any) => {
-              console.log("Subscription approved:", data);
-              try {
-                // Create our subscription record
-                const response = await fetch('/api/create-paypal-subscription', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    name,
-                    email,
-                    zodiacSign,
-                    subscriptionId: data.subscriptionID
-                  })
-                });
-
-                if (!response.ok) {
-                  throw new Error('Failed to record subscription');
-                }
-
-                window.location.href = `/subscription-success?subscription_id=${data.subscriptionID}`;
-              } catch (err) {
-                console.error("Error recording subscription:", err);
-                setError("Subscription approved but failed to record. Please contact support.");
-              }
-            },
-            onError: (err: any) => {
-              console.error("PayPal Error:", err);
-              setError("There was an error processing your subscription. Please try again.");
-            }
-          }).render("#paypal-button-container")
-            .catch((err: any) => {
-              console.error("PayPal render error:", err);
-              setError("Failed to load PayPal button. Please refresh the page.");
-            });
+          console.log("PayPal script loaded successfully");
+          setPaypalLoaded(true);
         };
 
         script.onerror = () => {
-          setError("Failed to load PayPal. Please check your internet connection and try again.");
+          console.error("PayPal script failed to load");
+          setError("Failed to load PayPal script. Please check your internet connection.");
           setIsLoading(false);
         };
 
         document.body.appendChild(script);
 
-        return () => {
-          document.body.removeChild(script);
-        };
       } catch (err) {
-        console.error("PayPal script loading error:", err);
-        setError("Failed to initialize PayPal. Please try again.");
+        console.error("PayPal initialization error:", err);
+        setError("Failed to initialize PayPal: " + (err as Error).message);
         setIsLoading(false);
       }
     };
 
     loadPayPalScript();
-  }, [name, email, zodiacSign]);
+  }, []);
 
   if (isLoading) {
     return (
@@ -107,10 +112,10 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
   if (error) {
     return (
       <div className="w-full p-4 text-center">
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500 mb-2">{error}</p>
         <button 
           onClick={() => window.location.reload()}
-          className="mt-2 text-violet-500 hover:text-violet-400"
+          className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
         >
           Try Again
         </button>
@@ -120,7 +125,7 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div id="paypal-button-container" className="mt-4"></div>
+      <div ref={containerRef} className="mt-4"></div>
     </div>
   );
 };
