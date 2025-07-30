@@ -14,41 +14,65 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
     setIsProcessing(true);
     
     try {
-      // Send PDF IMMEDIATELY - no waiting for PayPal webhooks!
-      console.log('Sending PDF to:', email);
+      // DIRECT RESEND API CALL - BYPASS SERVER!
+      console.log('Sending email directly to:', email);
       
-      const response = await fetch('/api/send-email', {
+      const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': 'Bearer re_U1nMQLbj_S2H4dx1owu1KQCNFKQG2XACF',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name,
-          email,
-          zodiacSign,
-          isWelcomeEmail: true
+          from: 'noreply@cadalunastro.com',
+          to: email,
+          subject: '🎉 Your Cosmic Calendar - ' + zodiacSign + ' Horoscope',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h1 style="color: #6366f1;">🌟 Your ${zodiacSign} Horoscope! 🌟</h1>
+              
+              <p>Dear ${name},</p>
+              
+              <p><strong>SUCCESS!</strong> Your personalized horoscope is ready!</p>
+              
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h2>✨ Your ${zodiacSign} Insights:</h2>
+                <p>This month brings new opportunities for ${zodiacSign}. Your cosmic energy is aligned for success in both personal and professional endeavors.</p>
+                <p><strong>Lucky Days:</strong> 15th, 22nd, 28th</p>
+                <p><strong>Lucky Colors:</strong> Blue, Silver, Purple</p>
+                <p><strong>Focus Areas:</strong> Career growth, relationships, health</p>
+              </div>
+              
+              <p><strong>Next delivery:</strong> 15th of each month</p>
+              
+              <p>Thank you for subscribing!</p>
+              <p>Best regards,<br>The Cosmic Calendar Team</p>
+            </div>
+          `
         })
       });
       
       if (response.ok) {
+        const result = await response.json();
         setPdfSent(true);
-        alert('✅ PDF sent to ' + email + '! Check your inbox and spam folder.');
+        alert('✅ EMAIL SENT SUCCESSFULLY to ' + email + '! Check your inbox!');
+        console.log('Email sent:', result);
         
-        // THEN redirect to PayPal for subscription
+        // THEN redirect to PayPal
         setTimeout(() => {
           const paypalUrl = "https://www.sandbox.paypal.com/webapps/billing/plans/subscribe?plan_id=P-80H55782K3289051ENCEUL3Q";
           window.location.href = paypalUrl;
         }, 2000);
       } else {
         const errorData = await response.json();
-        console.error('API Error:', errorData);
-        alert('❌ Error sending PDF: ' + (errorData.error || 'Unknown error'));
+        console.error('Resend API Error:', errorData);
+        alert('❌ Email failed: ' + JSON.stringify(errorData));
         setIsProcessing(false);
       }
       
     } catch (error) {
-      console.error('Error sending PDF:', error);
-      alert('❌ Network error. Check console and try again.');
+      console.error('Direct email error:', error);
+      alert('❌ Email error: ' + error.message);
       setIsProcessing(false);
     }
   };
