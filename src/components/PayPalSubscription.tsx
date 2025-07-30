@@ -27,7 +27,7 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
       });
       
             // Direct PayPal subscription link (SANDBOX MODE)  
-      const paypalUrl = "https://www.sandbox.paypal.com/webapps/billing/plans/subscribe?plan_id=P-80H557B9K528905TNCEUL3Q";
+      const paypalUrl = "https://www.sandbox.paypal.com/webapps/billing/plans/subscribe?plan_id=P-80H55782K3289051ENCEUL3Q";
       
       // Redirect to PayPal (same window for better UX)
       window.location.href = paypalUrl;
