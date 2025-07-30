@@ -26,7 +26,7 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
         })
       });
       
-      // Direct PayPal subscription link
+      // Direct PayPal subscription link (LIVE MODE)
       const paypalUrl = "https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-40N61099UW225793TNCE7N4I";
       
       // Redirect to PayPal (same window for better UX)
