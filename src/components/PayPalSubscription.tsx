@@ -17,7 +17,7 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
       // Send PDF IMMEDIATELY - no waiting for PayPal webhooks!
       console.log('Sending PDF to:', email);
       
-      const response = await fetch('/api/send-calendar', {
+      const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
