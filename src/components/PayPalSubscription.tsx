@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface PayPalSubscriptionProps {
   name: string;
@@ -7,50 +7,26 @@ interface PayPalSubscriptionProps {
 }
 
 const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zodiacSign }) => {
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isSendingPdf, setIsSendingPdf] = useState(false);
+
   const handlePayPalClick = () => {
     // Direct PayPal subscription link from the copy link option
     const paypalUrl = "https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-40N61099UW225793TNCE7N4I";
     
     // Open PayPal in new window
-    const newWindow = window.open(paypalUrl, '_blank');
+    window.open(paypalUrl, '_blank');
     
-    // After payment, call our API to send PDF
-    const checkPayment = setInterval(() => {
-      if (newWindow && newWindow.closed) {
-        clearInterval(checkPayment);
-        
-        // PayPal window closed, assume payment completed
-        // Call our API to send welcome PDF
-        fetch('/api/create-paypal-subscription', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            zodiacSign,
-            subscriptionId: `paypal_${Date.now()}`
-          })
-        }).then(() => {
-          // Redirect to success page
-          window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
-        }).catch(() => {
-          // Still redirect even if API fails
-          window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
-        });
-      }
-    }, 1000);
+    // Show confirmation button after PayPal opens
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmPayment = async () => {
+    setIsSendingPdf(true);
     
-    // Fallback: if window doesn't close within 5 minutes, assume payment completed
-    setTimeout(() => {
-      clearInterval(checkPayment);
-      if (newWindow && !newWindow.closed) {
-        newWindow.close();
-      }
-      
+    try {
       // Call API to send PDF
-      fetch('/api/create-paypal-subscription', {
+      await fetch('/api/create-paypal-subscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,12 +37,15 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
           zodiacSign,
           subscriptionId: `paypal_${Date.now()}`
         })
-      }).then(() => {
-        window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
-      }).catch(() => {
-        window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
       });
-    }, 300000); // 5 minutes
+      
+      // Redirect to success page
+      window.location.href = `/subscription-success?subscription_id=paypal_${Date.now()}`;
+    } catch (error) {
+      console.error('Error sending PDF:', error);
+      alert('Error sending PDF. Please try again.');
+      setIsSendingPdf(false);
+    }
   };
 
   return (
@@ -80,6 +59,21 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
         </svg>
         Subscribe with PayPal - $9.99/month
       </button>
+      
+      {showConfirmation && (
+        <div className="mt-4 p-4 bg-green-100 border border-green-400 rounded-lg">
+          <p className="text-green-800 mb-3">
+            <strong>Payment completed?</strong> Click below to receive your PDF:
+          </p>
+          <button
+            onClick={handleConfirmPayment}
+            disabled={isSendingPdf}
+            className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded font-semibold"
+          >
+            {isSendingPdf ? 'Sending PDF...' : '✅ Confirm Payment & Send PDF'}
+          </button>
+        </div>
+      )}
       
       <p className="text-xs text-white/50 text-center mt-3">
         Click to complete your subscription securely through PayPal
