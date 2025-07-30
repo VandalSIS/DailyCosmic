@@ -12,15 +12,17 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     target: 'esnext',
-    minify: 'esbuild',
-    cssMinify: true,
     rollupOptions: {
       output: {
         format: 'es',
-        entryFileNames: `assets/[name].[hash].js`,
-        chunkFileNames: `assets/[name].[hash].js`,
-        assetFileNames: `assets/[name].[hash].[ext]`
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]'
       }
     }
+  },
+  server: {
+    port: 3000,
+    host: true
   }
 });
