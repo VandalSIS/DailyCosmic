@@ -3,12 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, ArrowLeft, Shield, Loader2, Crown, Calendar, Mail } from "lucide-react";
+import { Star, ArrowLeft, Shield, Crown, Calendar, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CelestialBackground } from "@/components/CelestialBackground";
 import { ZodiacSymbol3D } from "@/components/ZodiacSymbol3D";
 import { motion } from "framer-motion";
-import { addSubscriber } from "@/lib/subscriptionManager";
+import PayPalSubscription from "@/components/PayPalSubscription";
 
 const Payment = () => {
   const location = useLocation();
@@ -17,7 +17,7 @@ const Payment = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const formData = location.state?.formData;
   
-  // Test plan details (moved from server-side)
+  // Test plan details
   const testPlan = {
     price: '0.01',
     currency: 'USD',
@@ -43,55 +43,6 @@ const Payment = () => {
       </div>
     );
   }
-
-  const handleSubscription = async () => {
-    setIsProcessing(true);
-    try {
-      // First, create a subscriber
-      const subscriber = addSubscriber({
-        name: formData.name,
-        email: formData.email,
-        zodiacSign: formData.zodiacSign
-      });
-      
-      console.log('🚀 Creating PayPal subscription via API...');
-      
-      // Call server-side API to create subscription
-      const response = await fetch('/api/create-paypal-subscription', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          zodiacSign: formData.zodiacSign,
-          subscriberId: subscriber.id // Pass the subscriber ID
-        })
-      });
-
-      const result = await response.json();
-
-      if (result.success && result.data.approvalUrl) {
-        console.log('✅ Subscription created:', result.data.subscriptionId);
-        
-        // Redirect to PayPal for approval
-        window.location.href = result.data.approvalUrl;
-      } else {
-        throw new Error(result.error || 'Failed to create subscription');
-      }
-
-    } catch (error) {
-      console.error('Subscription creation error:', error);
-      toast({
-        title: "❌ Subscription Failed",
-        description: error.message || "Failed to create subscription. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   const handleBackToForm = () => {
     navigate('/', { state: { formData } });
@@ -210,26 +161,13 @@ const Payment = () => {
                   </div>
 
                   <div className="pt-4">
-                    <Button
-                      onClick={handleSubscription}
-                      disabled={isProcessing}
-                      className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold py-3"
-                    >
-                      {isProcessing ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Creating Subscription...
-                        </>
-                      ) : (
-                        <>
-                          <Crown className="w-4 h-4 mr-2" />
-                          Subscribe with PayPal
-                        </>
-                      )}
-                    </Button>
-
+                    <PayPalSubscription
+                      name={formData.name}
+                      email={formData.email}
+                      zodiacSign={formData.zodiacSign}
+                    />
                     <p className="text-xs text-white/50 text-center mt-3">
-                      You'll be redirected to PayPal to complete your subscription.
+                      Complete your subscription securely through PayPal.
                       {testPlan.price === '0.01' && ' This is test mode - you will only be charged 1¢.'}
                     </p>
                   </div>
