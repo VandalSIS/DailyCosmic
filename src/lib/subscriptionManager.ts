@@ -20,6 +20,8 @@ interface SubscriberData {
   status: 'pending' | 'active' | 'cancelled';
   paypalSubscriptionId?: string;
   nextDeliveryDate?: string;
+  lastHoroscopeSent?: string;
+  totalHoroscopesReceived?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -129,7 +131,7 @@ export function markHoroscopeSent(subscriberId: string, month: string): boolean 
   if (!subscriber) return false;
   
   subscriber.lastHoroscopeSent = month;
-  subscriber.totalHoroscopesReceived++;
+  subscriber.totalHoroscopesReceived = (subscriber.totalHoroscopesReceived || 0) + 1;
   
   console.log(`📧 Horoscope sent to ${subscriber.email} for ${month}`);
   return true;
