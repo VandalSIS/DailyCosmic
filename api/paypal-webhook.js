@@ -15,13 +15,7 @@ export default async function handler(req, res) {
     const webhookBody = JSON.stringify(req.body);
     console.log('PayPal Webhook received:', {
       event_type: req.body.event_type,
-      resource_type: req.body.resource_type,
-      headers: {
-        paypalTransmissionId,
-        paypalCertId,
-        paypalTransmissionSig,
-        paypalTransmissionTime
-      }
+      resource_type: req.body.resource_type
     });
 
     // Handle different webhook events
@@ -30,46 +24,22 @@ export default async function handler(req, res) {
     if (eventType === 'BILLING.SUBSCRIPTION.ACTIVATED') {
       console.log('✅ Subscription activated:', req.body.resource.id);
       
-      // Extract subscriber info from custom_id if available
-      const customId = req.body.resource.custom_id;
-      const subscriptionId = req.body.resource.id;
-      
-      console.log('Subscription details:', {
-        subscriptionId,
-        customId,
-        status: req.body.resource.status
-      });
-      
     } else if (eventType === 'PAYMENT.SALE.COMPLETED') {
       console.log('💰 Payment completed!');
       
       const paymentInfo = req.body.resource;
       const subscriptionId = paymentInfo.billing_agreement_id;
       
-      console.log('Payment details:', {
-        paymentId: paymentInfo.id,
-        subscriptionId,
-        amount: paymentInfo.amount,
-        payerEmail: paymentInfo.payer?.payer_info?.email
-      });
-      
-      // This is where we send the PDF!
+      // Send PDF for payment
       await sendPdfToSubscriber(paymentInfo, subscriptionId);
       
     } else if (eventType === 'BILLING.SUBSCRIPTION.PAYMENT.COMPLETED') {
       console.log('💰 Subscription payment completed!');
       
       const paymentInfo = req.body.resource;
-      const subscriptionId = paymentInfo.billing_agreement_id;
-      
-      console.log('Subscription payment details:', {
-        subscriptionId,
-        amount: paymentInfo.amount_with_breakdown,
-        status: paymentInfo.status
-      });
       
       // Send PDF for subscription payment
-      await sendPdfToSubscriber(paymentInfo, subscriptionId);
+      await sendPdfToSubscriber(paymentInfo, null);
     }
 
     return res.status(200).json({ success: true, message: 'Webhook processed' });
@@ -92,26 +62,9 @@ async function sendPdfToSubscriber(paymentInfo, subscriptionId) {
       return;
     }
     
-    // Import subscriber functions
-    const { getSubscriberByEmail, updateSubscriberStatus } = await import('./store-subscriber.js');
-    
-    // Look up subscriber details by email
-    const subscriber = getSubscriberByEmail(email);
-    
-    if (!subscriber) {
-      console.error('No subscriber found for email:', email);
-      // Still try to send with basic info from PayPal
-      var zodiacSign = 'Gemini'; // Default fallback
-      var name = paymentInfo.payer?.payer_info?.first_name || 'Valued Customer';
-    } else {
-      // Use stored subscriber info
-      var zodiacSign = subscriber.zodiacSign;
-      var name = subscriber.name;
-      
-      // Update subscriber status to active
-      updateSubscriberStatus(email, 'active');
-      console.log('✅ Subscriber activated:', subscriber);
-    }
+    // Use default zodiac for now (you can enhance this later)
+    const zodiacSign = 'Gemini';
+    const name = paymentInfo.payer?.payer_info?.first_name || 'Valued Customer';
     
     const { Resend } = await import('resend');
     const { getSignedUrl } = await import('@vercel/blob');
@@ -151,8 +104,6 @@ async function sendPdfToSubscriber(paymentInfo, subscriptionId) {
           </div>
           
           <p><strong>Next delivery:</strong> 15th of each month</p>
-          
-          <p>If you don't see the PDF attachment, please check your spam folder.</p>
           
           <p>Thank you for your subscription!</p>
           <p>Best regards,<br>The Cosmic Calendar Team</p>

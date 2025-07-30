@@ -1,4 +1,4 @@
-// Simple in-memory storage for subscribers (in production, use a database)
+// Simple storage for subscribers 
 const subscribers = new Map();
 
 export default async function handler(req, res) {
@@ -13,13 +13,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Store subscriber info with email as key for easy lookup
+    // Store subscriber info
     const subscriberData = {
       name,
       email,
       zodiacSign,
       createdAt: new Date().toISOString(),
-      status: 'pending' // Will be updated to 'active' when payment is confirmed
+      status: 'pending'
     };
 
     subscribers.set(email, subscriberData);
@@ -36,21 +36,4 @@ export default async function handler(req, res) {
     console.error('Error storing subscriber:', error);
     return res.status(500).json({ error: 'Failed to store subscriber information' });
   }
-}
-
-// Export function to get subscriber by email (for webhook use)
-export function getSubscriberByEmail(email) {
-  return subscribers.get(email);
-}
-
-// Export function to update subscriber status
-export function updateSubscriberStatus(email, status) {
-  const subscriber = subscribers.get(email);
-  if (subscriber) {
-    subscriber.status = status;
-    subscriber.updatedAt = new Date().toISOString();
-    subscribers.set(email, subscriber);
-    return subscriber;
-  }
-  return null;
 }
