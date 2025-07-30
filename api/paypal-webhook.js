@@ -6,6 +6,10 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('🔥 WEBHOOK CALLED! 🔥');
+    console.log('Full webhook body:', JSON.stringify(req.body, null, 2));
+    console.log('Headers:', req.headers);
+    
     // Get PayPal headers for webhook verification
     const paypalTransmissionId = req.headers['paypal-transmission-id'];
     const paypalCertId = req.headers['paypal-cert-id'];
