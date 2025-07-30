@@ -46,7 +46,7 @@ export default async function handler(req, res) {
               <li>Printable high-quality PDF</li>
             </ul>
           </div>
-          
+
           <p><strong>Next delivery:</strong> 15th of each month</p>
           
           <p>If you don't see the PDF attachment, please check your spam folder.</p>
