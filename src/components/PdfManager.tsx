@@ -30,18 +30,19 @@ export const PdfManager = () => {
     setIsChecking(true);
     const allPdfs = getAllZodiacPdfs();
     
-    const initialStatuses = allPdfs.map(pdf => ({
-      sign: pdf.sign,
-      fileName: pdf.fileName,
-      displayName: pdf.displayName,
+    // Convert the object to an array
+    const pdfArray = Object.entries(allPdfs).map(([sign, mapping]) => ({
+      sign: sign.charAt(0).toUpperCase() + sign.slice(1),
+      fileName: mapping.filename,
+      displayName: mapping.displayName,
       exists: false,
       loading: true
     }));
     
-    setPdfStatuses(initialStatuses);
+    setPdfStatuses(pdfArray);
 
     const updatedStatuses = await Promise.all(
-      allPdfs.map(async (pdf) => {
+      pdfArray.map(async (pdf) => {
         const exists = await checkPdfExists(pdf.fileName);
         return {
           sign: pdf.sign,
