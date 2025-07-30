@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 interface PayPalSubscriptionProps {
   name: string;
@@ -7,39 +8,60 @@ interface PayPalSubscriptionProps {
 }
 
 const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zodiacSign }) => {
-  const handlePayPalClick = () => {
-    // Simple PayPal subscription URL
-    const paypalUrl = `https://www.paypal.com/subscriptions/checkout?plan_id=P-40N61099UW225793TNCE7N4I`;
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleTestSubscription = async () => {
+    setIsProcessing(true);
     
-    // Open PayPal in new window
-    const newWindow = window.open(paypalUrl, '_blank', 'width=600,height=700');
+    // Simulate PayPal processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Check if window opened successfully
-    if (newWindow) {
-      // After 3 seconds, redirect to success (for testing)
-      setTimeout(() => {
-        window.location.href = `/subscription-success?subscription_id=test_${Date.now()}`;
-      }, 3000);
-    } else {
-      // If popup blocked, redirect directly
-      window.location.href = paypalUrl;
+    // Create subscription record
+    try {
+      await fetch('/api/create-paypal-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          zodiacSign,
+          subscriptionId: `test_${Date.now()}`
+        })
+      });
+    } catch (error) {
+      console.log('API call failed, continuing anyway');
     }
+    
+    // Redirect to success page
+    window.location.href = `/subscription-success?subscription_id=test_${Date.now()}`;
   };
 
   return (
     <div className="w-full max-w-md mx-auto">
       <button
-        onClick={handlePayPalClick}
-        className="w-full px-6 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-lg flex items-center justify-center gap-3 transition-colors shadow-lg"
+        onClick={handleTestSubscription}
+        disabled={isProcessing}
+        className="w-full px-6 py-4 bg-green-500 hover:bg-green-400 disabled:bg-green-600 text-white font-semibold rounded-lg flex items-center justify-center gap-3 transition-colors shadow-lg"
       >
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 7.27a.641.641 0 0 1 .633-.54h6.504c3.114 0 5.635 2.521 5.635 5.635 0 3.114-2.521 5.635-5.635 5.635H9.348l-.758 3.337zm7.086-9.337c0-2.206-1.789-3.995-3.995-3.995H6.577l-1.758 7.73h5.822c2.206 0 3.995-1.789 3.995-3.995z"/>
-        </svg>
-        Subscribe with PayPal - $0.01/month
+        {isProcessing ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            Processing Test Subscription...
+          </>
+        ) : (
+          <>
+            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Test Subscription - $0.01/month
+          </>
+        )}
       </button>
       
       <p className="text-xs text-white/50 text-center mt-3">
-        Click to complete your subscription securely through PayPal
+        TEST MODE: This simulates a PayPal subscription for testing purposes
       </p>
     </div>
   );
