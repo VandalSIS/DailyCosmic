@@ -1,20 +1,4 @@
 import React, { useState } from "react";
-import { Resend } from 'resend';
-
-// Define types for Resend API
-interface ResendEmailOptions {
-  from: string;
-  to: string;
-  subject: string;
-  html: string;
-}
-
-interface ResendResponse {
-  id: string;
-  from: string;
-  to: string;
-  created_at: string;
-}
 
 interface PayPalSubscriptionProps {
   name: string;
@@ -30,53 +14,25 @@ const PayPalSubscription = ({ name, email, zodiacSign }: PayPalSubscriptionProps
     setIsProcessing(true);
     
     try {
-      // Initialize Resend
-      const resend = new Resend('re_U1nMQLbj_S2H4dx1owu1KQCNFKQG2XACF');
-
-      // Send email directly
-      const emailData = await resend.emails.send({
-        from: 'noreply@cadalunastro.com',
-        to: email,
-        subject: `🌟 Your ${zodiacSign} Horoscope - Personal Reading`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #6366f1;">🌟 Your Personal ${zodiacSign} Reading 🌟</h1>
-            
-            <p>Dear ${name},</p>
-            
-            <p>Thank you for choosing Cosmic Calendar! Here is your personalized horoscope reading.</p>
-            
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
-              <h2>✨ Your ${zodiacSign} Insights:</h2>
-              <p>The stars have aligned to reveal your path forward. This reading is specifically crafted for you.</p>
-              
-              <h3>🌠 Key Areas of Focus:</h3>
-              <ul style="list-style: none; padding: 0;">
-                <li>💫 <strong>Career:</strong> Major opportunities ahead! Your professional life takes an exciting turn.</li>
-                <li>❤️ <strong>Love:</strong> Deep connections form. Express your feelings openly.</li>
-                <li>🧘‍♀️ <strong>Health:</strong> Focus on rest and rejuvenation. Try meditation.</li>
-                <li>💰 <strong>Money:</strong> Financial prospects improve. Smart investments pay off.</li>
-              </ul>
-
-              <div style="margin-top: 20px;">
-                <p><strong>🎯 Lucky Days:</strong> 15th, 22nd, 28th</p>
-                <p><strong>🎨 Power Colors:</strong> Blue, Silver, Purple</p>
-                <p><strong>💎 Crystal Guide:</strong> Amethyst - For clarity and peace</p>
-              </div>
-            </div>
-            
-            <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-top: 20px;">
-              <h3 style="color: #4b5563;">🌙 Monthly Affirmation</h3>
-              <p style="font-style: italic;">"I am aligned with the cosmic energy. Success and happiness flow naturally to me."</p>
-            </div>
-
-            <p style="margin-top: 20px;">May the stars light your path!</p>
-            <p>Best wishes,<br>The Cosmic Calendar Team</p>
-          </div>
-        `
+      // Send email via API route
+      const response = await fetch('/api/send-horoscope', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          zodiacSign
+        })
       });
 
-      console.log('Email sent successfully:', emailData);
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+
+      const result = await response.json();
+      console.log('Email sent successfully:', result);
       setPdfSent(true);
       alert('✨ Success! Check your email for your personal reading!');
 
