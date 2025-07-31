@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Resend } from 'resend';
 
 interface PayPalSubscriptionProps {
   name: string;
@@ -14,22 +15,39 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
     setIsProcessing(true);
     
     try {
-      // Send email first
-      const response = await fetch('https://www.cadalunastro.com/api/send-horoscope', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          zodiacSign
-        })
+      // Initialize Resend
+      const resend = new Resend('re_U1nMQLbj_S2H4dx1owu1KQCNFKQG2XACF');
+
+      // Send email directly
+      const emailData = await resend.emails.send({
+        from: 'noreply@cadalunastro.com',
+        to: email,
+        subject: `🌟 Your ${zodiacSign} Horoscope from Cosmic Calendar`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #6366f1;">🌟 Your ${zodiacSign} Horoscope! 🌟</h1>
+            
+            <p>Dear ${name},</p>
+            
+            <p><strong>SUCCESS!</strong> Your personalized horoscope is ready!</p>
+            
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+              <h2>✨ Your ${zodiacSign} Insights:</h2>
+              <p>This month brings new opportunities for ${zodiacSign}. Your cosmic energy is aligned for success in both personal and professional endeavors.</p>
+              <p><strong>Lucky Days:</strong> 15th, 22nd, 28th</p>
+              <p><strong>Lucky Colors:</strong> Blue, Silver, Purple</p>
+              <p><strong>Focus Areas:</strong> Career growth, relationships, health</p>
+            </div>
+            
+            <p><strong>Next delivery:</strong> 15th of each month</p>
+            
+            <p>Thank you for subscribing!</p>
+            <p>Best regards,<br>The Cosmic Calendar Team</p>
+          </div>
+        `
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send email');
-      }
+      console.log('Email sent successfully:', emailData);
 
       // Show success message
       setPdfSent(true);
