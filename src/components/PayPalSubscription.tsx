@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { Resend } from 'resend';
 
-interface HoroscopeSenderProps {
+interface PayPalSubscriptionProps {
   name: string;
   email: string;
   zodiacSign: string;
 }
 
-const HoroscopeSender: React.FC<HoroscopeSenderProps> = ({ name, email, zodiacSign }) => {
+const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zodiacSign }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [pdfSent, setPdfSent] = useState(false);
 
-  const handleSendHoroscope = async () => {
+  const handlePayPalClick = async () => {
     setIsProcessing(true);
     
     try {
@@ -64,6 +64,13 @@ const HoroscopeSender: React.FC<HoroscopeSenderProps> = ({ name, email, zodiacSi
       console.log('Email sent successfully:', emailData);
       setPdfSent(true);
       alert('✨ Success! Check your email for your personal reading!');
+
+      // Wait 2 seconds then redirect to PayPal
+      setTimeout(() => {
+        const paypalUrl = "https://www.sandbox.paypal.com/webapps/billing/plans/subscribe?plan_id=P-80H55782K3289051ENCEUL3Q";
+        window.location.href = paypalUrl;
+      }, 2000);
+
     } catch (error) {
       console.error('Error:', error);
       alert('❌ Error: ' + error.message);
@@ -81,68 +88,7 @@ const HoroscopeSender: React.FC<HoroscopeSenderProps> = ({ name, email, zodiacSi
             Check your email: <strong>{email}</strong>
           </p>
           <p className="text-green-600 text-xs mt-1">
-            (Check spam folder if not received in 2 minutes)
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full max-w-md mx-auto">
-      <button
-        onClick={handleSendHoroscope}
-        disabled={isProcessing}
-        className="w-full px-6 py-4 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-400 text-white font-semibold rounded-lg flex items-center justify-center gap-3 transition-colors shadow-lg"
-      >
-        {isProcessing ? (
-          <>
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            Sending Your Reading...
-          </>
-        ) : (
-          <>
-            <span className="text-2xl">✨</span>
-            Get Your Personal Reading
-          </>
-        )}
-      </button>
-      
-      <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-        <p className="text-purple-800 text-sm">
-          <strong>What You'll Receive:</strong>
-        </p>
-        <ul className="text-purple-700 text-xs mt-2 space-y-1">
-          <li>• Personalized ${zodiacSign} Reading</li>
-          <li>• Career & Love Insights</li>
-          <li>• Lucky Days & Colors</li>
-          <li>• Monthly Affirmation</li>
-          <li>• Crystal Recommendations</li>
-        </ul>
-      </div>
-    </div>
-  );
-      
-    } catch (error) {
-      console.error('Error:', error);
-      alert('❌ Error: ' + error.message);
-      setIsProcessing(false);
-    }
-  };
-
-  if (pdfSent) {
-    return (
-      <div className="w-full max-w-md mx-auto">
-        <div className="p-4 bg-green-100 border border-green-400 rounded-lg">
-          <h3 className="text-green-800 font-semibold">✅ Email Sent Successfully!</h3>
-          <p className="text-green-700 text-sm mt-2">
-            Check your email: <strong>{email}</strong>
-          </p>
-          <p className="text-green-600 text-xs mt-1">
-            Redirecting to PayPal for subscription...
+            Redirecting to PayPal...
           </p>
         </div>
       </div>
@@ -159,18 +105,20 @@ const HoroscopeSender: React.FC<HoroscopeSenderProps> = ({ name, email, zodiacSi
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 7.27a.641.641 0 0 1 .633-.54h6.504c3.114 0 5.635 2.521 5.635 5.635 0 3.114-2.521 5.635-5.635 5.635H9.348l-.758 3.337zm7.086-9.337c0-2.206-1.789-3.995-3.995-3.995H6.577l-1.758 7.73h5.822c2.206 0 3.995-1.789 3.995-3.995z"/>
         </svg>
-        {isProcessing ? 'Sending PDF...' : '🎯 Get PDF + Subscribe ($0.01)'}
+        {isProcessing ? 'Sending Reading...' : '🎯 Get Reading + Subscribe ($0.01)'}
       </button>
       
-      <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-800 text-sm font-semibold">
-          🚀 SIMPLE APPROACH:
+      <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-blue-800 text-sm">
+          <strong>What You'll Receive:</strong>
         </p>
-        <ol className="text-red-700 text-xs mt-2 space-y-1">
-          <li>1. Click button → PDF sent IMMEDIATELY to your email</li>
-          <li>2. Then redirected to PayPal for subscription</li>
-          <li>3. NO WAITING, NO WEBHOOKS, JUST WORKS!</li>
-        </ol>
+        <ul className="text-blue-700 text-xs mt-2 space-y-1">
+          <li>• Personalized ${zodiacSign} Reading</li>
+          <li>• Career & Love Insights</li>
+          <li>• Lucky Days & Colors</li>
+          <li>• Monthly Affirmation</li>
+          <li>• Crystal Recommendations</li>
+        </ul>
       </div>
       
       <p className="text-xs text-white/50 text-center mt-3">
