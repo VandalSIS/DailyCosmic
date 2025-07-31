@@ -252,11 +252,11 @@ const Index = () => {
                     <div className="space-y-3">
                     <div className="flex items-start gap-3 text-sm text-white/80">
                       <Star className="w-4 h-4 text-violet-300 mt-0.5 flex-shrink-0" />
-                      <span>365 days of personalized daily guidance</span>
+                      <span>Monthly personalized horoscope guidance</span>
                     </div>
                     <div className="flex items-start gap-3 text-sm text-white/80">
                       <Calendar className="w-4 h-4 text-violet-300 mt-0.5 flex-shrink-0" />
-                      <span>Daily do's and don'ts based on your zodiac sign</span>
+                      <span>Monthly insights based on your zodiac sign</span>
                     </div>
                     <div className="flex items-start gap-3 text-sm text-white/80">
                       <Gift className="w-4 h-4 text-violet-300 mt-0.5 flex-shrink-0" />
@@ -318,9 +318,9 @@ const Index = () => {
             <Card className="border border-violet-500/20 bg-black/40 backdrop-blur-xl">
               <CardContent className="p-6 text-center">
                 <Calendar className="w-12 h-12 text-violet-300 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">Daily Guidance</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">Monthly Guidance</h3>
                 <p className="text-white/70 text-sm">
-                  365 days of cosmic insights to help you make the right decisions
+                  Monthly cosmic insights to help you make the right decisions
                 </p>
               </CardContent>
             </Card>

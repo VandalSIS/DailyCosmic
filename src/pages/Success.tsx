@@ -25,7 +25,7 @@ const Success = () => {
 
   const sendPdf = async (name: string, email: string, zodiacSign: string) => {
     try {
-      const response = await fetch('/api/send-horoscope', {
+      const response = await fetch('/api/send-calendar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,14 +113,14 @@ const Success = () => {
             Your personalized horoscope has been sent to your email address.
             Please check your inbox (and spam folder).
           </p>
-          <div className="bg-blue-500/20 rounded-lg p-3">
-            <p className="text-sm">
-              <strong>What you received:</strong><br/>
-              • Personalized daily horoscope<br/>
-              • 365 days of cosmic guidance<br/>
-              • High-quality PDF format
-            </p>
-          </div>
+                     <div className="bg-blue-500/20 rounded-lg p-3">
+             <p className="text-sm">
+               <strong>What you received:</strong><br/>
+               • Personalized monthly horoscope<br/>
+               • Complete cosmic guidance<br/>
+               • High-quality PDF format
+             </p>
+           </div>
         </div>
 
         <div className="space-y-4">

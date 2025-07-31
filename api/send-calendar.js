@@ -202,7 +202,7 @@ export default async function handler(req, res) {
           <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
             <h2 style="color: #fff; margin-top: 0;">Hello ${name}! ✨</h2>
             <p style="color: #e0e0e0; line-height: 1.6;">
-              Here's your FREE <strong>${cleanZodiacSign} horoscope reading</strong> as a special gift!
+              Here's your FREE <strong>${cleanZodiacSign} monthly horoscope</strong> as a special gift!
             </p>
             
             <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
@@ -227,7 +227,7 @@ export default async function handler(req, res) {
 
           <div style="text-align: center; margin-top: 30px;">
             <p style="color: #e0e0e0; font-size: 14px;">
-              Want your <strong>complete 365-day horoscope calendar</strong>?<br>
+              Want your <strong>complete monthly horoscope calendar</strong>?<br>
               Get the full experience with our premium reading! 🌟
             </p>
             <p style="color: #e0e0e0; font-size: 12px; margin-top: 10px;">
