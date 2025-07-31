@@ -1,13 +1,28 @@
 import React, { useState } from "react";
 import { Resend } from 'resend';
 
+// Define types for Resend API
+interface ResendEmailOptions {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+}
+
+interface ResendResponse {
+  id: string;
+  from: string;
+  to: string;
+  created_at: string;
+}
+
 interface PayPalSubscriptionProps {
   name: string;
   email: string;
   zodiacSign: string;
 }
 
-const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zodiacSign }) => {
+const PayPalSubscription = ({ name, email, zodiacSign }: PayPalSubscriptionProps): JSX.Element => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [pdfSent, setPdfSent] = useState(false);
 
@@ -113,7 +128,7 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
           <strong>What You'll Receive:</strong>
         </p>
         <ul className="text-blue-700 text-xs mt-2 space-y-1">
-          <li>• Personalized ${zodiacSign} Reading</li>
+          <li>• Personalized {zodiacSign} Reading</li>
           <li>• Career & Love Insights</li>
           <li>• Lucky Days & Colors</li>
           <li>• Monthly Affirmation</li>
