@@ -90,7 +90,14 @@ const Index = () => {
       return;
     }
 
-    navigate('/payment', { state: { formData } });
+    // Save user data to localStorage for success page
+    localStorage.setItem('userName', formData.name);
+    localStorage.setItem('userEmail', formData.email);
+    localStorage.setItem('userZodiac', formData.zodiacSign);
+
+    // Redirect to PayPal payment
+    const paypalUrl = "https://www.paypal.com/ncp/payment/4RUELC8L4ZX56";
+    window.location.href = paypalUrl;
   };
 
   // Helper function to get zodiac sign key (without emoji)
