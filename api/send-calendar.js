@@ -61,18 +61,18 @@ export default async function handler(req, res) {
     
     // Import zodiac mapping to get PDF URL
     const zodiacPdfMapping = {
-      aries: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/aries-calendar-TvKkvqf5gU4sV50Ze7zpMoZhHzmBHa.pdf',
-      taurus: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Taurus%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-0z1DCFmeGIoZGd9nDS1irXLdUubLAz.pdf',
-      gemini: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Gemini%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-vaDoM71E7xF6S72QsBXmujM38aBJqZ.pdf',
-      cancer: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Cancer%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-RQCbA1n6KzAhLU0AzOwuepUoxzlkAD.pdf',
-      leo: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Leo%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-6FtRD8yaWPCbQZHC8ZubG9O1GiHbIn.pdf',
-      virgo: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Virgo%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-ZhDgkfAQaA7cdxdM0TWVj06GJghRpc.pdf',
-      libra: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Libra%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-HezBGjxZjLoLEHKkvu1qj23ZTST2wv.pdf',
-      scorpio: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Scorpio%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-VaR5QSMzAwbdvvQ3AlyORkxZx3ynVX.pdf',
-      sagittarius: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Sagittarius%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-5VhvnUU2BY2v4FZIl7K5WkMVJdLvRC.pdf',
-      capricorn: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Capricorn%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-S0lixufWlVh8LLDIwdu4kDyJrTkc4y.pdf',
-      aquarius: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Aquarius%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-tAHcVTaM1xOEuyTAfHGHOPy2hUTe2L.pdf',
-      pisces: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Pisces%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520July%25202025-twRDjWJGXqJJaPDdQMRgPKB06qLbqX.pdf'
+      aries: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Aries%2520Astrology%2520Calendar%2520-%2520August%25202025.pdf',
+      taurus: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Taurus%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf',
+      gemini: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Gemini%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf',
+      cancer: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Cancer%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf',
+      leo: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Leo%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf',
+      virgo: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Virgo%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf',
+      libra: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Libra%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf',
+      scorpio: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Scorpio%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf',
+      sagittarius: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Sagittarius%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf',
+      capricorn: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Capricorn%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf',
+      aquarius: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Aquarius%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf',
+      pisces: 'https://jf7h0ykfn8fx1fma.public.blob.vercel-storage.com/Pisces%2520Astrology%2520Calendar%2520%25E2%2580%2593%2520August%25202025.pdf'
     };
     
     // Check if PDF is available for this zodiac sign
@@ -191,37 +191,23 @@ export default async function handler(req, res) {
     let emailData;
     
     if (isPaid) {
-      // PAID: Send PDF attachment
-      emailData = {
-        from: 'Cosmic Daily Planner <noreply@cadalunastro.com>',
-        to: [email],
-        subject: `🌟 Your ${cleanZodiacSign} Horoscope - Premium Reading`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #6366f1;">🌟 Your Premium ${cleanZodiacSign} Reading 🌟</h1>
-            
-            <p>Dear ${name},</p>
-            
-            <p>Thank you for your purchase! Your personalized horoscope PDF is attached to this email.</p>
-            
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
-              <h2>✨ What You'll Find in Your PDF:</h2>
-              <ul style="list-style: none; padding: 0;">
-                <li>💫 <strong>Career Insights:</strong> Major opportunities ahead!</li>
-                <li>❤️ <strong>Love Guidance:</strong> Deep connections form</li>
-                <li>🧘‍♀️ <strong>Health Tips:</strong> Focus on rest and rejuvenation</li>
-                <li>💰 <strong>Money Forecast:</strong> Financial prospects improve</li>
-                <li>🎯 <strong>Lucky Days:</strong> 15th, 22nd, 28th</li>
-                <li>🎨 <strong>Power Colors:</strong> Blue, Silver, Purple</li>
-                <li>💎 <strong>Crystal Guide:</strong> Amethyst for clarity</li>
-              </ul>
-            </div>
-            
-            <p style="margin-top: 20px;">Your personalized ${cleanZodiacSign} horoscope PDF is attached below!</p>
-            <p>May the stars light your path!</p>
-            <p>Best wishes,<br>The Cosmic Calendar Team</p>
-          </div>
-        `,
+             // PAID: Send PDF attachment
+       emailData = {
+         from: 'Cosmic Daily Planner <noreply@cadalunastro.com>',
+         to: [email],
+         subject: `🌟 Your ${cleanZodiacSign} Horoscope - Premium Reading`,
+         html: `
+           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+             <h1 style="color: #6366f1;">🌟 Welcome ${name}! 🌟</h1>
+             
+             <p>Thank you for your purchase!</p>
+             
+             <p>Your personalized ${cleanZodiacSign} horoscope PDF is attached to this email.</p>
+             
+             <p style="margin-top: 20px;">Enjoy your cosmic guidance!</p>
+             <p>Best wishes,<br>The Cosmic Calendar Team</p>
+           </div>
+         `,
         attachments: [
           {
             filename: `${zodiacKey}-horoscope.pdf`,
