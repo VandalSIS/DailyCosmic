@@ -20,39 +20,23 @@ export const sendZodiacCalendarEmail = async (
   pdfFilename: string
 ): Promise<EmailResult> => {
   try {
-    console.log('Starting email send process for:', { toEmail, zodiacSign, pdfUrl });
-    
-    // Check if API key is set
-    if (!process.env.RESEND_API_KEY) {
-      throw new Error('RESEND_API_KEY is not configured');
-    }
-
     // Fetch PDF from Blob storage
-    console.log('Fetching PDF from:', pdfUrl);
     const pdfResponse = await fetch(pdfUrl);
     if (!pdfResponse.ok) {
-      console.error('PDF fetch failed:', {
-        status: pdfResponse.status,
-        statusText: pdfResponse.statusText,
-        url: pdfUrl
-      });
-      throw new Error(`Failed to fetch PDF: ${pdfResponse.status} ${pdfResponse.statusText}`);
+      throw new Error(`Failed to fetch PDF: ${pdfResponse.statusText}`);
     }
 
-    console.log('PDF fetched successfully, converting to base64...');
     const pdfBuffer = await pdfResponse.arrayBuffer();
     const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
-    console.log('PDF converted to base64, size:', pdfBase64.length);
 
     // Clean zodiac sign (remove emoji)
     const cleanZodiacSign = zodiacSign.split(' ')[0];
 
     // Send email with Resend
-    console.log('Sending email via Resend...');
     const { data, error } = await resend.emails.send({
-      from: 'Cosmic Daily Planner <noreply@cadalunastro.com>', // Make sure this domain is verified
+      from: 'Cosmic Daily Planner <onboarding@resend.dev>', // Use your domain once verified
       to: [toEmail],
-      subject: `🌟 Your ${cleanZodiacSign} Cosmic Calendar is Ready!`,
+      subject: `🌟 Your FREE ${cleanZodiacSign} Calendar is Ready!`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
           <div style="text-align: center; margin-bottom: 30px;">
@@ -63,7 +47,7 @@ export const sendZodiacCalendarEmail = async (
           <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
             <h2 style="color: #fff; margin-top: 0;">Hello ${userName}! ✨</h2>
             <p style="color: #e0e0e0; line-height: 1.6;">
-              Your <strong>${cleanZodiacSign} Daily Calendar</strong> is attached to this email! 
+              Your FREE <strong>${cleanZodiacSign} Daily Calendar</strong> is attached to this email! 
               This personalized calendar contains 365 days of cosmic guidance specifically tailored for your zodiac sign.
             </p>
           </div>

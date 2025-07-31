@@ -93,15 +93,4 @@ export function getMissingPdfs(): string[] {
   return Object.entries(zodiacPdfMapping)
     .filter(([_, mapping]) => !mapping.blobUrl)
     .map(([sign, _]) => sign);
-}
-
-// Helper function to get all zodiac PDFs
-export function getAllZodiacPdfs(): Record<string, ZodiacPdfMapping> {
-  return zodiacPdfMapping;
-}
-
-// Helper function to get PDF by zodiac sign
-export function getPdfByZodiacSign(zodiacSign: string): ZodiacPdfMapping | null {
-  const cleanSign = getCleanZodiacSign(zodiacSign);
-  return zodiacPdfMapping[cleanSign] || null;
 } 
