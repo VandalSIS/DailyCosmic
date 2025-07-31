@@ -15,7 +15,7 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
     
     try {
       // Send email first
-      const response = await fetch('/api/send-horoscope', {
+      const response = await fetch('https://www.cadalunastro.com/api/send-horoscope', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
