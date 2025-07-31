@@ -290,13 +290,11 @@ const Index = () => {
 
             <Button
               onClick={handleProceedToPayment}
-              variant="outline"
-              className="border-violet-500/50 text-violet-300 hover:bg-violet-500/10 px-8 py-6 text-lg font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-black px-8 py-6 text-lg font-semibold rounded-xl shadow-xl transform transition-all duration-200 hover:scale-105"
               size="lg"
-              disabled={true}
             >
               <CreditCard className="w-5 h-5 mr-2" />
-              Premium Version (Coming Soon)
+              Pay €9.99 - Get Horoscope
             </Button>
           </motion.div>
 
