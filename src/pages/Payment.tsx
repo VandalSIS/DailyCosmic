@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CelestialBackground } from "@/components/CelestialBackground";
 import { ZodiacSymbol3D } from "@/components/ZodiacSymbol3D";
 import { motion } from "framer-motion";
-import PayPalSubscription from "@/components/PayPalSubscription";
+import HoroscopeSender from "@/components/HoroscopeSender";
 
 const Payment = () => {
   const location = useLocation();
@@ -161,7 +161,7 @@ const Payment = () => {
                   </div>
 
                   <div className="pt-4">
-                    <PayPalSubscription
+                    <HoroscopeSender
                       name={formData.name}
                       email={formData.email}
                       zodiacSign={formData.zodiacSign}
