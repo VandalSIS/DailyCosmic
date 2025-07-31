@@ -44,7 +44,7 @@ export default async function handler(req, res) {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const { email, zodiacSign, name } = req.body;
+    const { email, zodiacSign, name, isPaid } = req.body;
 
     if (!email || !zodiacSign || !name) {
       return res.status(400).json({ 
@@ -187,57 +187,102 @@ export default async function handler(req, res) {
         </div>
       `;
 
-    // Prepare email data with HTML content only (no PDF attachment)
-    const emailData = {
-      from: 'Cosmic Daily Planner <noreply@cadalunastro.com>',
-      to: [email],
-      subject: `🌟 Your FREE ${cleanZodiacSign} Horoscope Reading`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #fff; font-size: 28px; margin-bottom: 10px;">🌟 Your FREE ${cleanZodiacSign} Reading 🌟</h1>
-            <p style="color: #e0e0e0; font-size: 16px;">A gift from the stars just for you!</p>
-          </div>
-          
-          <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <h2 style="color: #fff; margin-top: 0;">Hello ${name}! ✨</h2>
-            <p style="color: #e0e0e0; line-height: 1.6;">
-              Here's your FREE <strong>${cleanZodiacSign} monthly horoscope</strong> as a special gift!
-            </p>
+    // Prepare email data based on whether it's paid or free
+    let emailData;
+    
+    if (isPaid) {
+      // PAID: Send PDF attachment
+      emailData = {
+        from: 'Cosmic Daily Planner <noreply@cadalunastro.com>',
+        to: [email],
+        subject: `🌟 Your ${cleanZodiacSign} Horoscope - Premium Reading`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #6366f1;">🌟 Your Premium ${cleanZodiacSign} Reading 🌟</h1>
             
-            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
-              <h3 style="color: #fff; margin-top: 0;">✨ Your ${cleanZodiacSign} Insights:</h3>
-              <ul style="color: #e0e0e0; line-height: 1.6; padding-left: 20px;">
-                <li><strong>Career:</strong> New opportunities are coming your way</li>
-                <li><strong>Love:</strong> Open your heart to new connections</li>
-                <li><strong>Health:</strong> Focus on balance and self-care</li>
-                <li><strong>Money:</strong> Good financial decisions ahead</li>
+            <p>Dear ${name},</p>
+            
+            <p>Thank you for your purchase! Your personalized horoscope PDF is attached to this email.</p>
+            
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+              <h2>✨ What You'll Find in Your PDF:</h2>
+              <ul style="list-style: none; padding: 0;">
+                <li>💫 <strong>Career Insights:</strong> Major opportunities ahead!</li>
+                <li>❤️ <strong>Love Guidance:</strong> Deep connections form</li>
+                <li>🧘‍♀️ <strong>Health Tips:</strong> Focus on rest and rejuvenation</li>
+                <li>💰 <strong>Money Forecast:</strong> Financial prospects improve</li>
+                <li>🎯 <strong>Lucky Days:</strong> 15th, 22nd, 28th</li>
+                <li>🎨 <strong>Power Colors:</strong> Blue, Silver, Purple</li>
+                <li>💎 <strong>Crystal Guide:</strong> Amethyst for clarity</li>
               </ul>
             </div>
             
-            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
-              <h3 style="color: #fff; margin-top: 0;">🎯 Quick Tips:</h3>
+            <p style="margin-top: 20px;">Your personalized ${cleanZodiacSign} horoscope PDF is attached below!</p>
+            <p>May the stars light your path!</p>
+            <p>Best wishes,<br>The Cosmic Calendar Team</p>
+          </div>
+        `,
+        attachments: [
+          {
+            filename: `${zodiacKey}-horoscope.pdf`,
+            content: pdfBase64,
+            contentType: 'application/pdf',
+          }
+        ]
+      };
+    } else {
+      // FREE: Send HTML content only
+      emailData = {
+        from: 'Cosmic Daily Planner <noreply@cadalunastro.com>',
+        to: [email],
+        subject: `🌟 Your FREE ${cleanZodiacSign} Horoscope Reading`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #fff; font-size: 28px; margin-bottom: 10px;">🌟 Your FREE ${cleanZodiacSign} Reading 🌟</h1>
+              <p style="color: #e0e0e0; font-size: 16px;">A gift from the stars just for you!</p>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <h2 style="color: #fff; margin-top: 0;">Hello ${name}! ✨</h2>
               <p style="color: #e0e0e0; line-height: 1.6;">
-                <strong>Lucky Day:</strong> This weekend<br>
-                <strong>Power Color:</strong> Blue<br>
-                <strong>Focus:</strong> Communication and learning
+                Here's your FREE <strong>${cleanZodiacSign} monthly horoscope</strong> as a special gift!
+              </p>
+              
+              <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <h3 style="color: #fff; margin-top: 0;">✨ Your ${cleanZodiacSign} Insights:</h3>
+                <ul style="color: #e0e0e0; line-height: 1.6; padding-left: 20px;">
+                  <li><strong>Career:</strong> New opportunities are coming your way</li>
+                  <li><strong>Love:</strong> Open your heart to new connections</li>
+                  <li><strong>Health:</strong> Focus on balance and self-care</li>
+                  <li><strong>Money:</strong> Good financial decisions ahead</li>
+                </ul>
+              </div>
+              
+              <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <h3 style="color: #fff; margin-top: 0;">🎯 Quick Tips:</h3>
+                <p style="color: #e0e0e0; line-height: 1.6;">
+                  <strong>Lucky Day:</strong> This weekend<br>
+                  <strong>Power Color:</strong> Blue<br>
+                  <strong>Focus:</strong> Communication and learning
+                </p>
+              </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+              <p style="color: #e0e0e0; font-size: 14px;">
+                Want your <strong>complete monthly horoscope calendar</strong>?<br>
+                Get the full experience with our premium reading! 🌟
+              </p>
+              <p style="color: #e0e0e0; font-size: 12px; margin-top: 10px;">
+                Thank you for choosing Cosmic Daily Planner!<br>
+                May the stars guide your path to success and happiness.
               </p>
             </div>
           </div>
-
-          <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #e0e0e0; font-size: 14px;">
-              Want your <strong>complete monthly horoscope calendar</strong>?<br>
-              Get the full experience with our premium reading! 🌟
-            </p>
-            <p style="color: #e0e0e0; font-size: 12px; margin-top: 10px;">
-              Thank you for choosing Cosmic Daily Planner!<br>
-              May the stars guide your path to success and happiness.
-            </p>
-          </div>
-        </div>
-      `
-    };
+        `
+      };
+    }
 
     // Send email with Resend using your verified domain
     const { data, error } = await resend.emails.send(emailData);

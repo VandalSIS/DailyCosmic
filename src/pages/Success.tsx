@@ -33,7 +33,8 @@ const Success = () => {
         body: JSON.stringify({
           name,
           email,
-          zodiacSign
+          zodiacSign,
+          isPaid: true
         })
       });
 
