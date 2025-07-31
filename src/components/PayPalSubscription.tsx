@@ -14,45 +14,31 @@ const PayPalSubscription: React.FC<PayPalSubscriptionProps> = ({ name, email, zo
     setIsProcessing(true);
     
     try {
-      // SIMPLE MAILTO APPROACH - ALWAYS WORKS!
-      console.log('Creating email for:', email);
-      
-      const subject = encodeURIComponent(`🌟 Your ${zodiacSign} Horoscope from Cosmic Calendar`);
-      const body = encodeURIComponent(`Dear ${name},
+      // Send email first
+      const response = await fetch('/api/send-horoscope', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          zodiacSign
+        })
+      });
 
-✨ Your ${zodiacSign} Horoscope is Ready! ✨
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
 
-This month brings new opportunities for ${zodiacSign}. Your cosmic energy is aligned for success in both personal and professional endeavors.
-
-🌟 Lucky Days: 15th, 22nd, 28th
-🎨 Lucky Colors: Blue, Silver, Purple  
-🎯 Focus Areas: Career growth, relationships, health
-
-Thank you for subscribing to Cosmic Calendar!
-
-Next delivery: 15th of each month
-
-Best regards,
-The Cosmic Calendar Team
-
----
-Complete your subscription: https://www.sandbox.paypal.com/webapps/billing/plans/subscribe?plan_id=P-80H55782K3289051ENCEUL3Q`);
-
-      // Create mailto link
-      const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
-      
       // Show success message
       setPdfSent(true);
-      alert('✅ EMAIL TEMPLATE CREATED! Your horoscope is ready!');
       
-      // Open email client
-      window.open(mailtoLink, '_blank');
-      
-      // THEN redirect to PayPal after 3 seconds
+      // Wait 2 seconds then redirect to PayPal
       setTimeout(() => {
         const paypalUrl = "https://www.sandbox.paypal.com/webapps/billing/plans/subscribe?plan_id=P-80H55782K3289051ENCEUL3Q";
         window.location.href = paypalUrl;
-      }, 3000);
+      }, 2000);
       
     } catch (error) {
       console.error('Error:', error);
@@ -65,7 +51,7 @@ Complete your subscription: https://www.sandbox.paypal.com/webapps/billing/plans
     return (
       <div className="w-full max-w-md mx-auto">
         <div className="p-4 bg-green-100 border border-green-400 rounded-lg">
-          <h3 className="text-green-800 font-semibold">✅ PDF Sent Successfully!</h3>
+          <h3 className="text-green-800 font-semibold">✅ Email Sent Successfully!</h3>
           <p className="text-green-700 text-sm mt-2">
             Check your email: <strong>{email}</strong>
           </p>
