@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY || 're_U1nNGLbj_52HAdxiowuiKQCNFKQGzXACF');
+const resend = new Resend('re_U1nNGLbj_52HAdxiowuiKQCNFKQGzXACF');
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -29,9 +29,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-          const emailData = await resend.emails.send({
-        from: 'onboarding@resend.dev', // Use Resend's default domain for testing
-        to: email,
+    const emailData = await resend.emails.send({
+      from: 'onboarding@resend.dev', // Use Resend's default domain for testing
+      to: email,
       subject: `🌟 Your ${zodiacSign} Horoscope - Personal Reading`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
